@@ -4,48 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Montaż Filmów - globalcut.pl - Profesjonalne usługi video</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Stylowanie przełącznika języków - małe flagi */
-        .language-switcher {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 101;
-            display: flex;
-            gap: 8px;
-            background: rgba(10, 10, 10, 0.9);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
-            padding: 8px 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        }
-        
-        .language-flag {
-            font-size: 18px;
-            cursor: pointer;
-            opacity: 0.7;
-            transition: all 0.3s ease;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            overflow: hidden;
-        }
-        
-        .language-flag:hover {
-            opacity: 1;
-            transform: scale(1.15);
-        }
-        
-        .language-flag.active {
-            opacity: 1;
-            transform: scale(1.2);
-            box-shadow: 0 0 0 2px var(--primary);
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -102,6 +62,94 @@
             z-index: 2;
         }
 
+        /* Nowe style dla funkcji powiększania filmu */
+        .video-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+        
+        .expanded-video-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            height: 90vh;
+            max-width: 1200px;
+            z-index: 10001;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            cursor: default;
+        }
+        
+        .video-player {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-grow: 1;
+        }
+        
+        .video-player iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .video-controls {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            padding: 15px;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+        }
+        
+        .close-video {
+            background: rgba(255, 138, 0, 0.9);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            color: #000;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .close-video:hover {
+            background: #fff;
+            transform: scale(1.1);
+        }
+        
+        /* Ukrywamy opcje udostępniania */
+        .video-controls .share-options {
+            display: none;
+        }
+        
         .hero-section {
             min-height: 100vh;
             display: flex;
@@ -278,6 +326,7 @@
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
             transition: left 0.5s ease;
+            pointer-events: none;
         }
 
         .nav-btn:hover {
@@ -297,18 +346,21 @@
         }
 
         .section {
-            display: none;
+            min-height: 100vh;
             padding: clamp(60px, 8vw, 120px) 0;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            scroll-margin-top: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            scroll-snap-align: start;
         }
 
-        .section.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
+        /* POPRAWKA: Sekcja Portfolio ma dynamiczną wysokość */
+        #portfolio.section {
+            min-height: auto;
+            height: auto;
+            justify-content: flex-start;
+            padding: clamp(60px, 8vw, 120px) 0;
+            scroll-snap-align: none;
         }
 
         .section-title {
@@ -461,21 +513,9 @@
 
         .project-thumbnail {
             width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, var(--dark-card) 0%, #2d2d2d 100%);
-        }
-
-        .project-card.instagram-reel .project-thumbnail,
-        .project-card.youtube-shorts .project-thumbnail {
-            height: 500px;
-        }
-
-        .project-card:not(.youtube-shorts):not(.instagram-reel) .project-thumbnail {
-            height: 280px;
+            aspect-ratio: 16/9;
         }
 
         .project-thumbnail::after {
@@ -508,29 +548,9 @@
             transform: scale(1.05);
         }
 
+        /* Ukrywamy tytuły i opisy w portfolio */
         .project-info {
-            padding: clamp(1.5rem, 3vw, 2rem);
-            position: relative;
-            z-index: 2;
-        }
-
-        .project-title {
-            font-size: clamp(1.1rem, 2.5vw, 1.25rem);
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-            color: #ffffff;
-            transition: color 0.3s ease;
-        }
-
-        .project-card:hover .project-title {
-            color: var(--primary);
-        }
-
-        .project-description {
-            font-size: clamp(0.85rem, 2vw, 0.9375rem);
-            line-height: 1.6;
-            color: var(--text-gray);
-            font-weight: 300;
+            display: none;
         }
 
         .video-container {
@@ -578,6 +598,7 @@
             background: linear-gradient(90deg, transparent, var(--primary), transparent);
             opacity: 0;
             transition: opacity 0.3s ease;
+            z-index: 1;
         }
 
         .price-card::after {
@@ -590,6 +611,7 @@
             background: radial-gradient(circle at center, rgba(255, 138, 0, 0.05) 0%, transparent 70%);
             opacity: 0;
             transition: opacity 0.3s ease;
+            z-index: 1;
         }
 
         .price-card:hover {
@@ -687,6 +709,8 @@
             background: radial-gradient(circle at center, rgba(255, 138, 0, 0.05) 0%, transparent 70%);
             opacity: 0;
             transition: opacity 0.3s ease;
+            z-index: 1;
+            pointer-events: none;
         }
 
         .contact-item:hover {
@@ -730,7 +754,6 @@
             z-index: 2;
         }
 
-        /* Styl dla zielonego ptaszka WhatsApp */
         .whatsapp-presence {
             color: #25D366;
             font-size: clamp(0.85rem, 2vw, 0.9375rem);
@@ -996,6 +1019,7 @@
             font-size: clamp(2rem, 5vw, 3rem);
             color: var(--primary);
             margin-bottom: clamp(1rem, 2vw, 1.5rem);
+            pointer-events: none;
         }
 
         .modal-title {
@@ -1009,26 +1033,6 @@
             color: var(--text-gray);
             line-height: 1.6;
             margin-bottom: clamp(1.5rem, 3vw, 2rem);
-        }
-
-        .video-player {
-            width: 100%;
-            height: 0;
-            padding-bottom: 56.25%;
-            position: relative;
-            background: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: clamp(1.5rem, 3vw, 2rem);
-        }
-
-        .video-player iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
         }
 
         .fade-in {
@@ -1087,18 +1091,216 @@
             display: flex;
         }
 
-        /* Responsywność dla różnych urządzeń */
+        .scroll-indicator {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .scroll-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 138, 0, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .scroll-dot.active {
+            background: var(--primary);
+            transform: scale(1.3);
+            box-shadow: 0 0 10px rgba(255, 138, 0, 0.7);
+        }
+
+        /* Nowe style dla flag SVG */
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 8px 12px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .language-switcher:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+        }
+
+        .language-flag {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .language-flag svg {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .language-flag:hover {
+            opacity: 0.9;
+            transform: scale(1.1);
+        }
+        
+        .language-flag.active {
+            opacity: 1;
+            transform: scale(1.2);
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        
+        .language-flag.active svg {
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        
+        .language-flag:hover svg {
+            transform: scale(1.1);
+        }
+
+        /* Animacja zmiany języka */
+        .language-transition {
+            animation: languageFade 0.5s ease;
+        }
+        
+        @keyframes languageFade {
+            0% { opacity: 0.5; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Poprawki dla sekcji portfolio */
+        .project-thumbnail {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+        }
+
+        .instagram-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            z-index: 2;
+            transition: all 0.5s ease;
+        }
+
+        .instagram-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .youtube-thumb {
+            background: #000;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .youtube-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+            transition: all 0.3s ease;
+        }
+
+        .play-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: #fff;
+        }
+
+        .project-card:hover .play-icon {
+            transform: translate(-50%, -50%) scale(1.2);
+            background: var(--primary);
+        }
+
+        .project-card:hover .youtube-thumb img {
+            transform: scale(1.05);
+        }
+
+        .project-card:hover .instagram-placeholder {
+            transform: scale(1.05);
+        }
+
+        /* Animacja gradientu dla Instagrama */
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .instagram-placeholder {
+            background-size: 200% 200%;
+            animation: gradientAnimation 10s ease infinite;
+        }
+
+        .youtube-player-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        /* Responsywność */
         @media (max-width: 1200px) {
-            .project-card.instagram-reel .project-thumbnail,
-            .project-card.youtube-shorts .project-thumbnail {
-                height: 450px;
+            .project-thumbnail {
+                height: 250px;
             }
         }
 
         @media (max-width: 992px) {
-            .project-card.instagram-reel .project-thumbnail,
-            .project-card.youtube-shorts .project-thumbnail {
-                height: 400px;
+            .project-thumbnail {
+                height: 220px;
             }
         }
 
@@ -1122,13 +1324,45 @@
                 bottom: 20px;
             }
             
-            .project-card.instagram-reel .project-thumbnail,
-            .project-card.youtube-shorts .project-thumbnail {
-                height: 350px;
+            .project-thumbnail {
+                height: 200px;
             }
             
             .section-title {
                 font-size: clamp(1.6rem, 5vw, 2.5rem);
+            }
+
+            .scroll-indicator {
+                display: none;
+            }
+            
+            .language-switcher {
+                top: 15px;
+                right: 15px;
+                padding: 6px 10px;
+                gap: 8px;
+            }
+
+            /* Zmiany dla powiększonych filmów na telefonach */
+            .expanded-video-container {
+                width: 95%;
+                height: 60vh;
+                border-radius: 0;
+            }
+
+            .video-controls {
+                top: auto;
+                bottom: 0;
+                justify-content: center;
+                background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+            }
+
+            .close-video {
+                width: 60px;
+                height: 60px;
+                font-size: 2.5rem;
+                position: relative;
+                margin: 0 auto;
             }
         }
 
@@ -1153,9 +1387,8 @@
                 font-size: 2.2rem;
             }
             
-            .project-card.instagram-reel .project-thumbnail,
-            .project-card.youtube-shorts .project-thumbnail {
-                height: 300px;
+            .project-thumbnail {
+                height: 180px;
             }
             
             .section {
@@ -1165,12 +1398,33 @@
             .section-title {
                 margin-bottom: 30px;
             }
+            
+            .language-switcher {
+                top: 10px;
+                right: 10px;
+                padding: 5px 8px;
+                gap: 6px;
+            }
+            
+            .language-flag {
+                width: 24px;
+                height: 24px;
+            }
+
+            .expanded-video-container {
+                height: 50vh;
+            }
+
+            .close-video {
+                width: 50px;
+                height: 50px;
+                font-size: 2rem;
+            }
         }
 
         @media (max-width: 480px) {
-            .project-card.instagram-reel .project-thumbnail,
-            .project-card.youtube-shorts .project-thumbnail {
-                height: 280px;
+            .project-thumbnail {
+                height: 160px;
             }
             
             .price-card {
@@ -1180,26 +1434,61 @@
             .contact-item {
                 padding: 1.2rem;
             }
-        }
-
-        /* Performance optimizations */
-        .will-change {
-            will-change: transform, opacity;
+            
+            .language-switcher {
+                top: 8px;
+                right: 8px;
+                padding: 4px 6px;
+            }
+            
+            .play-icon {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .play-icon svg {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .instagram-icon {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="grain-overlay"></div>
     <div class="progress-bar" id="progressBar"></div>
-    <div class="loading-indicator" id="loadingIndicator">
-        <div class="spinner"></div>
-    </div>
     
-    <!-- Przełącznik języków - małe flagi -->
+    <!-- Przełącznik języków z flagami SVG -->
     <div class="language-switcher">
-        <div class="language-flag active" data-lang="pl">🇵🇱</div>
-        <div class="language-flag" data-lang="de">🇩🇪</div>
-        <div class="language-flag" data-lang="en">🇬🇧</div>
+        <div class="language-flag active" data-lang="pl" aria-label="Polski">
+            <svg viewBox="0 0 36 24" xmlns="http://www.w3.org/2000/svg">
+                <rect width="36" height="24" fill="#fff"/>
+                <rect width="36" height="12" y="12" fill="#dc143c"/>
+            </svg>
+        </div>
+        <div class="language-flag" data-lang="de" aria-label="Deutsch">
+            <svg viewBox="0 0 36 24" xmlns="http://www.w3.org/2000/svg">
+                <rect width="36" height="8" fill="#000"/>
+                <rect width="36" height="8" y="8" fill="#dd0000"/>
+                <rect width="36" height="8" y="16" fill="#ffcc00"/>
+            </svg>
+        </div>
+        <div class="language-flag" data-lang="en" aria-label="English">
+            <svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
+                <rect width="60" height="30" fill="#012169"/>
+                <path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/>
+                <path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="4"/>
+                <rect width="60" height="30" fill="none" stroke="#fff" stroke-width="10"/>
+                <rect width="60" height="30" fill="none" stroke="#C8102E" stroke-width="6"/>
+                <rect x="24" width="12" height="30" fill="#fff"/>
+                <rect y="12" width="60" height="6" fill="#fff"/>
+                <rect x="24" width="12" height="30" fill="#C8102E"/>
+                <rect y="12" width="60" height="2" fill="#C8102E"/>
+            </svg>
+        </div>
     </div>
     
     <nav class="nav-container">
@@ -1213,246 +1502,307 @@
 
     <button class="scroll-to-top" id="scrollToTop">↑</button>
 
+    <div class="scroll-indicator" id="scrollIndicator"></div>
+
     <div class="container">
-        <section class="hero-section">
+        <section class="hero-section" id="hero">
             <div class="hero-content fade-in visible">
                 <h1 class="logo">
-                    <span class="logo-accent">MONTAŻ FILMÓW</span><br>
+                    <span class="logo-accent" id="hero-title">MONTAŻ FILMÓW</span><br>
                     globalcut.pl
                 </h1>
-                <p class="hero-subtitle">
+                <p class="hero-subtitle" id="hero-subtitle">
                     Profesjonalna postprodukcja filmowa<br>
                     Precyzja • Kreatywność • Jakość premium
                 </p>
-                <div class="premium-vibe">Ponad 1000 gotowych realizacji</div>
+                <div class="premium-vibe" id="premium-vibe">Ponad 1000 gotowych realizacji</div>
             </div>
             
             <div class="scroll-hint">
-                <span>Przewiń w dół</span>
+                <span id="scroll-text">Przewiń w dół</span>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
         </section>
 
-        <section id="about" class="section active">
-            <h2 class="section-title">Profesjonalny montaż filmowy</h2>
+        <section id="about" class="section">
+            <h2 class="section-title" id="about-title">Profesjonalny montaż filmowy</h2>
             <div class="about-content">
-                <p class="lead">Przekształcamy Twoje pomysły w wyjątkowe materiały filmowe, które angażują widzów i osiągają cele biznesowe. Specjalizujemy się w tworzeniu treści, które wyróżniają się na tle konkurencji.</p>
+                <p class="lead" id="about-lead">Przekształcamy Twoje pomysły w wyjątkowe materiały filmowe, które angażują widzów i osiągają cele biznesowe. Specjalizujemy się w tworzeniu treści, które wyróżniają się na tle konkurencji.</p>
                 
-                <h3>Nasza ekspertyza obejmuje:</h3>
-                <ul class="expertise-list">
+                <h3 id="expertise-title">Nasza ekspertyza obejmuje:</h3>
+                <ul class="expertise-list" id="expertise-list">
                     <li><strong>Vlogi i treści personal branding</strong> - budowanie autentycznego wizerunku</li>
                     <li><strong>Podcasty i wywiady</strong> - profesjonalne nagrania rozmów i dyskusji</li>
                     <li><strong>Filmy szkoleniowe</strong> - efektywne przekazywanie wiedzy i umiejętności</li>
                     <li><strong>Materiały reklamowe</strong> - przekonujące treści sprzedażowe</li>
-                    <li><strong>Treści korporacyjne</strong> - komunikacja wewnętrzna i zewnętrzna firm</li>
+                    <li><strong>Treści korporacyjne</strong> - komunikacja wewnętrzna i zewnętrzna firms</li>
                     <li><strong>Filmy pamiątkowe</strong> - uchwycenie najważniejszych momentów z wyjazdów i wydarzeń</li>
                 </ul>
                 
-                <h3>Dlaczego warto z nami współpracować:</h3>
-                <p class="about-text">Każdy projekt traktujemy jako wyjątkową opowieść, która zasługuje na perfekcyjne wykonanie. Łączymy artystyczną wrażliwość z biznesowym podejściem, dostarczając materiały, które nie tylko wyglądają profesjonalnie, ale przede wszystkim osiągają zamierzone cele.</p>
+                <h3 id="why-title">Dlaczego warto z nami współpracować:</h3>
+                <p class="about-text" id="why-text">Każdy projekt traktujemy jako wyjątkową opowieść, która zasługuje na perfekcyjne wykonanie. Łączymy artystyczną wrażliwość z biznesowym podejściem, dostarczając materiały, które nie tylko wyglądają profesjonalnie, ale przede wszystkim osiągają zamierzone cele.</p>
                 
-                <p class="about-text">Terminowość i dbałość o każdy detal to podstawa naszej pracy.</p>
+                <p class="about-text" id="timeliness-text">Terminowość i dbałość o każdy detal to podstawa naszej pracy.</p>
                 
-                <p class="highlight">
+                <p class="highlight" id="global-text">
                     <strong>Działamy globalnie</strong> - przyjmujemy zamówienia z całego świata. 
-                    Bez względu na lokalizację, Twój projekt otrzyma pełne profesjonalne wsparcie i personalne podejście.
+                    Bez względu na lokalizację, Twój projekt otrzyma pełne profesjonalne wsparcie and personalne podejście.
                 </p>
                 
-                <p>Gotowi przekuć Twoją wizję w materiał, który wywoła reakcję? Skontaktuj się z nami już dziś.</p>
+                <p id="contact-text">Gotowi przekuć Twoją wizję w materiał, który wywoła reakcję? Skontaktuj się z nami już dziś.</p>
             </div>
         </section>
 
         <section id="portfolio" class="section">
-            <h2 class="section-title">Nasze realizacje</h2>
+            <h2 class="section-title" id="portfolio-title">Nasze realizacje</h2>
             <div class="portfolio-grid">
-                <!-- YouTube Shorts Projects -->
-                <div class="project-card fade-in youtube-shorts">
+                <!-- Dodane nowe filmy z linków - TERAZ NA POCZĄTKU -->
+                <div class="project-card fade-in" data-video-id="Bu3wlaGuOyI">
                     <div class="project-thumbnail">
-                        <div class="video-container">
-                            <iframe 
-                                src="https://www.youtube.com/embed/ATDLr4gAic4" 
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen>
-                            </iframe>
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/Bu3wlaGuOyI/maxresdefault.jpg" 
+                                 alt="Miniatura filmu YouTube" 
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
                         </div>
                     </div>
-                    <div class="project-info">
-                        <h3 class="project-title">YouTube Shorts - Kgonciarz</h3>
-                        <p class="project-description">
-                            Krótki format wideo przygotowany dla YouTube Shorts. Dynamiczny montaż z szybkimi cięciami, idealny do szybkiego przeglądania treści.
-                        </p>
+                </div>
+
+                <div class="project-card fade-in" data-video-id="raMDfKZW-Y8">
+                    <div class="project-thumbnail">
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/raMDfKZW-Y8/maxresdefault.jpg" 
+                                 alt="Miniatura filmu YouTube" 
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card fade-in" data-video-id="QPUEQNhElcY">
+                    <div class="project-thumbnail">
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/QPUEQNhElcY/maxresdefault.jpg" 
+                                 alt="Miniatura filmu YouTube" 
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="project-card fade-in instagram-reel">
+                <!-- Instagram Reel 1 -->
+                <div class="project-card fade-in">
                     <div class="project-thumbnail">
-                        <div class="video-container">
-                            <iframe 
-                                src="https://www.instagram.com/reel/DKcVj1JzEup/embed" 
-                                allowtransparency="true" 
-                                frameborder="0" 
-                                scrolling="no" 
-                                allowfullscreen>
-                            </iframe>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <h3 class="project-title">Reel Instagram - Agentspecjalny</h3>
-                        <p class="project-description">
-                            Letni klimat regionu lubuskiego uchwycony w krótkiej formie. Montaż z rytmicznymi przejściami i efektami specjalnymi.
-                        </p>
+                        <a href="https://www.instagram.com/reel/DKcVj1JzEup/" target="_blank">
+                            <div class="instagram-placeholder">
+                                <div class="instagram-icon"><i class="fab fa-instagram"></i></div>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 
-                <div class="project-card fade-in youtube-shorts">
+                <!-- YouTube Shorts 1 -->
+                <div class="project-card fade-in" data-video-id="XtKtOHExd4Q">
                     <div class="project-thumbnail">
-                        <div class="video-container">
-                            <iframe 
-                                src="https://www.youtube.com/embed/CV-W4JOszj4" 
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen>
-                            </iframe>
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/XtKtOHExd4Q/maxresdefault.jpg" 
+                                 alt="Miniatura filmu YouTube - Winobranie" 
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
                         </div>
-                    </div>
-                    <div class="project-info">
-                        <h3 class="project-title">YouTube Shorts - Do Roboty</h3>
-                        <p class="project-description">
-                            Krótki film z serii "Do Roboty". Dynamiczne ujęcia i montaż podkreślające energię i profesjonalizm.
-                        </p>
                     </div>
                 </div>
                 
-                <div class="project-card fade-in youtube-shorts">
+                <!-- Nowy Instagram Reel -->
+                <div class="project-card fade-in">
                     <div class="project-thumbnail">
-                        <div class="video-container">
-                            <iframe 
-                                src="https://www.youtube.com/embed/RpHxtXJzwo8" 
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen>
-                            </iframe>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <h3 class="project-title">YouTube Shorts - Winobranie</h3>
-                        <p class="project-description">
-                            Krótki film promujący festiwal Winobranie w Zielonej Górze. Dynamiczne ujęcia z lotu ptaka połączone z energicznym montażem.
-                        </p>
+                        <a href="https://www.instagram.com/reel/DEf2Keusjfr/" target="_blank">
+                            <div class="instagram-placeholder">
+                                <div class="instagram-icon"><i class="fab fa-instagram"></i></div>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 
-                <div class="project-card fade-in instagram-reel">
+                <!-- Nowy YouTube Shorts 1 -->
+                <div class="project-card fade-in" data-video-id="UiGt1U6CXaY">
                     <div class="project-thumbnail">
-                        <div class="video-container">
-                            <iframe 
-                                src="https://www.instagram.com/reel/DJ4JheqsBFS/embed" 
-                                allowtransparency="true" 
-                                frameborder="0" 
-                                scrolling="no" 
-                                allowfullscreen>
-                            </iframe>
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/UiGt1U6CXaY/maxresdefault.jpg" 
+                                 alt="Miniatura filmu YouTube - Przyroda" 
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
                         </div>
-                    </div>
-                    <div class="project-info">
-                        <h3 class="project-title">Reel Instagram - Zielona Góra</h3>
-                        <p class="project-description">
-                            Krótki format wideo przygotowany specjalnie dla Instagrama. Dynamiczny montaż z wykorzystaniem efektów specjalnych i rytmicznym cięciem.
-                        </p>
                     </div>
                 </div>
                 
-                <div class="project-card fade-in instagram-reel">
+                <!-- Nowy YouTube Shorts 2 -->
+                <div class="project-card fade-in" data-video-id="8DYf28ktWGo">
                     <div class="project-thumbnail">
-                        <div class="video-container">
-                            <iframe 
-                                src="https://www.instagram.com/reel/DFAN7xgMbwt/embed" 
-                                allowtransparency="true" 
-                                frameborder="0" 
-                                scrolling="no" 
-                                allowfullscreen>
-                            </iframe>
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/8DYf28ktWGo/maxresdefault.jpg" 
+                                 alt="Miniatura filmu YouTube - Impreza" 
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
                         </div>
-                    </div>
-                    <div class="project-info">
-                        <h3 class="project-title">Reel Instagram - Projekt specjalny</h3>
-                        <p class="project-description">
-                            Kreatywny montaż z dynamicznymi przejściami i efektami wizualnymi. Idealny do promocji w mediach społecznościowych.
-                        </p>
                     </div>
                 </div>
-                
-                <div class="project-card fade-in youtube-shorts">
+
+                <!-- Nowe filmy YouTube Shorts -->
+                <div class="project-card fade-in" data-video-id="vJq6eslN0es">
                     <div class="project-thumbnail">
-                        <div class="video-container">
-                            <iframe 
-                                src="https://www.youtube.com/embed/PIPfBhUE4mY" 
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen>
-                            </iframe>
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/vJq6eslN0es/maxresdefault.jpg" 
+                                 alt="Miniatura filmu YouTube" 
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
                         </div>
-                    </div>
-                    <div class="project-info">
-                        <h3 class="project-title">YouTube Shorts - Projekt kreatywny</h3>
-                        <p class="project-description">
-                            Krótki format wideo z dynamicznym montażem i efektami specjalnymi. Idealny do szybkiego przeglądania treści.
-                        </p>
                     </div>
                 </div>
-                
-                <div class="project-card fade-in instagram-reel">
+
+                <div class="project-card fade-in" data-video-id="xeRC23dQB3o">
                     <div class="project-thumbnail">
-                        <div class="video-container">
-                            <iframe 
-                                src="https://www.instagram.com/reel/DEf2Keusjfr/embed" 
-                                allowtransparency="true" 
-                                frameborder="0" 
-                                scrolling="no" 
-                                allowfullscreen>
-                            </iframe>
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/xeRC23dQB3o/maxresdefault.jpg" 
+                                 alt="Miniatura filmu YouTube" 
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
                         </div>
-                    </div>
-                    <div class="project-info">
-                        <h3 class="project-title">Reel Instagram - Projekt specjalny</h3>
-                        <p class="project-description">
-                            Kreatywny montaż z dynamicznymi przejściami i efektami wizualnymi. Idealny do promocji w mediach społecznościowych.
-                        </p>
                     </div>
                 </div>
-                
-                <div class="project-card fade-in instagram-reel">
+
+                <div class="project-card fade-in" data-video-id="IAFefSAjUTM">
                     <div class="project-thumbnail">
-                        <div class="video-container">
-                            <iframe 
-                                src="https://www.instagram.com/reel/DFAMps_sg36/embed" 
-                                allowtransparency="true" 
-                                frameborder="0" 
-                                scrolling="no" 
-                                allowfullscreen>
-                            </iframe>
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/IAFefSAjUTM/maxresdefault.jpg" 
+                                 alt="Miniatura filmu YouTube" 
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
                         </div>
                     </div>
-                    <div class="project-info">
-                        <h3 class="project-title">Reel Instagram - Projekt kreatywny</h3>
-                        <p class="project-description">
-                            Innowacyjny montaż z niestandardowymi przejściami i efektami wizualnymi. Idealny do promocji w mediach społecznościowych.
-                        </p>
+                </div>
+
+                <div class="project-card fade-in" data-video-id="KtjYlioJgyA">
+                    <div class="project-thumbnail">
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/KtjYlioJgyA/maxresdefault.jpg" 
+                                 alt="Miniatura filmu YouTube" 
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card fade-in" data-video-id="D4Mll-qgX-A">
+                    <div class="project-thumbnail">
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/D4Mll-qgX-A/maxresdefault.jpg" 
+                                 alt="Miniatura filmu YouTube" 
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nowe filmy z linków klienta -->
+                <div class="project-card fade-in" data-video-id="_4B4RHQYlbg">
+                    <div class="project-thumbnail">
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/_4B4RHQYlbg/maxresdefault.jpg" 
+                                 alt="Miniatura filmu YouTube" 
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card fade-in" data-video-id="vAZ8tDkf9ws">
+                    <div class="project-thumbnail">
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/vAZ8tDkf9ws/maxresdefault.jpg" 
+                                 alt="Miniatura filmu YouTube" 
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <section id="pricing" class="section">
-            <h2 class="section-title">Cennik usług</h2>
+            <h2 class="section-title" id="pricing-title">Cennik usług</h2>
             <div class="pricing-grid">
                 <div class="price-card fade-in visible">
-                    <h3 class="price-title">Rolki Social Media</h3>
-                    <div class="price-amount" data-price="80-350">80-350 zł</div>
-                    <ul class="price-features">
+                    <h3 class="price-title" id="price-title-1">Rolki Social Media</h3>
+                    <div class="price-amount" data-price-pln="80-350">80-350 zł</div>
+                    <ul class="price-features" id="price-features-1">
                         <li>Montaż rolek Instagram/TikTok</li>
                         <li>Dynamiczne przejścia i efekty</li>
                         <li>Dopasowanie do trendów</li>
@@ -1463,13 +1813,13 @@
                 </div>
 
                 <div class="price-card fade-in visible">
-                    <h3 class="price-title">Filmy Pamiątkowe</h3>
-                    <div class="price-amount" data-price="200-500">200-500 zł</div>
-                    <ul class="price-features">
+                    <h3 class="price-title" id="price-title-2">Filmy Pamiątkowe</h3>
+                    <div class="price-amount" data-price-pln="200-500">200-500 zł</div>
+                    <ul class="price-features" id="price-features-2">
                         <li>Montaż filmów z wakacji</li>
                         <li>Filmy z imprez i uroczystości</li>
                         <li>Emocjonalna narracja</li>
-                        <li>Profesionalna ścieżka dźwiękowa</li>
+                        <li>Profesjonalna ścieżka dźwiękowa</li>
                         <li>Korekcja kolorów</li>
                         <li>2 rundy poprawek</li>
                         <li>Czas realizacji: 3-7 dni</li>
@@ -1477,9 +1827,9 @@
                 </div>
 
                 <div class="price-card fade-in visible">
-                    <h3 class="price-title">Vlogi</h3>
-                    <div class="price-amount" data-price="200-500">200-500 zł</div>
-                    <ul class="price-features">
+                    <h3 class="price-title" id="price-title-3">Vlogi</h3>
+                    <div class="price-amount" data-price-pln="200-500">200-500 zł</div>
+                    <ul class="price-features" id="price-features-3">
                         <li>Montaż vlogów do 10 min</li>
                         <li>Dynamiczne tempo narracji</li>
                         <li>Grafiki i napisy</li>
@@ -1493,67 +1843,67 @@
             </div>
             
             <div class="cta-section fade-in visible" onclick="activateContactSection()">
-                <h3 class="cta-title">Potrzebujesz wyceny?</h3>
-                <p class="cta-subtitle">
-                    Każdy projekt jest unikalny. Skontaktuj się z nami, aby otrzymać spersonalizowaną ofertę dostosowaną do Twoich potrzeb.
+                <h3 class="cta-title" id="cta-title">Potrzebujesz wyceny?</h3>
+                <p class="cta-subtitle" id="cta-subtitle">
+                    Każdy projekt jest unikalny. Skontaktuj się z nami, aby otrzymać spersonalizowanę ofertę dostosowaną do Twoich potrzeb.
                 </p>
             </div>
         </section>
 
         <section id="contact" class="section">
-            <h2 class="section-title">Kontakt</h2>
+            <h2 class="section-title" id="contact-title">Kontakt</h2>
             <div class="contact-grid">
                 <div class="contact-item fade-in visible">
                     <div class="contact-icon">📧</div>
-                    <h3 class="contact-title">Email</h3>
+                    <h3 class="contact-title" id="email-title">Email</h3>
                     <p class="contact-details">kontakt@globalcut.pl</p>
                 </div>
 
                 <div class="contact-item fade-in visible">
                     <div class="contact-icon">📱</div>
-                    <h3 class="contact-title">Telefon</h3>
+                    <h3 class="contact-title" id="phone-title">Telefon</h3>
                     <p class="contact-details">+48 576 054 446</p>
                     <p class="whatsapp-presence">
-                        <span class="whatsapp-check">✓</span> WhatsApp
+                        <span class="whatsapp-check">✓</span> <span id="whatsapp-text">WhatsApp</span>
                     </p>
                 </div>
 
                 <div class="contact-item fade-in visible">
                     <div class="contact-icon">📍</div>
-                    <h3 class="contact-title">Lokalizacja</h3>
+                    <h3 class="contact-title" id="location-title">Lokalizacja</h3>
                     <p class="contact-details">Zielona Góra</p>
                 </div>
 
                 <div class="contact-item fade-in visible">
                     <div class="facebook-icon">f</div>
-                    <h3 class="contact-title">Facebook</h3>
+                    <h3 class="contact-title" id="facebook-title">Facebook</h3>
                     <p class="contact-details">
                         <a href="https://www.facebook.com/profile.php?id=100087970451587&locale=pl_PL" 
                            target="_blank" 
                            style="color: var(--primary); text-decoration: none; border-bottom: 1px dashed var(--primary);">
-                            Odwiedź nasz profil
+                            <span id="visit-text">Odwiedź nasz profil</span>
                         </a>
                     </p>
                 </div>
             </div>
             
             <div class="contact-form fade-in visible" id="contactFormSection">
-                <h3 class="section-title" style="font-size: clamp(1.2rem, 3vw, 1.5rem); margin-bottom: clamp(1.5rem, 3vw, 2rem);">Wyślij nam wiadomość</h3>
+                <h3 class="section-title" style="font-size: clamp(1.2rem, 3vw, 1.5rem); margin-bottom: clamp(1.5rem, 3vw, 2rem);" id="form-title">Wyślij nam wiadomość</h3>
                 <form id="contactForm" action="https://formspree.io/f/mjvnyvzw" method="POST">
                     <div class="form-group">
-                        <label for="name">Imię i nazwisko</label>
+                        <label for="name" id="name-label">Imię i nazwisko</label>
                         <input type="text" id="name" name="name" required>
                     </div>
                     <div class="form-group">
-                        <label for="email">Email</label>
+                        <label for="email" id="email-label">Email</label>
                         <input type="email" id="email" name="email" required>
                     </div>
                     <div class="form-group">
-                        <label for="phone">Telefon (opcjonalnie)</label>
+                        <label for="phone" id="phone-label">Telefon (opcjonalnie)</label>
                         <input type="tel" id="phone" name="phone">
                     </div>
                     <div class="form-group">
-                        <label for="message">Wiadomość</label>
+                        <label for="message" id="message-label">Wiadomość</label>
                         <textarea id="message" name="message" required></textarea>
                     </div>
                     <button type="submit" class="submit-btn" id="submitBtn">Wyślij wiadomość</button>
@@ -1562,399 +1912,384 @@
         </section>
     </div>
 
+    <div class="video-overlay" id="videoOverlay"></div>
+    
     <div class="modal" id="formModal">
         <div class="modal-content">
             <button class="close-modal" id="closeFormModal">×</button>
             <div class="modal-icon">📧</div>
-            <h3 class="modal-title">Wiadomość wysłana!</h3>
-            <p class="modal-message">Dziękujemy za kontakt. Skontaktujemy się z Tobą w ciągu 24 godzin.</p>
-            <button class="submit-btn" onclick="document.getElementById('formModal').style.display = 'none'">OK</button>
+            <h3 class="modal-title" id="modal-title">Wiadomość wysłana!</h3>
+            <p class="modal-message" id="modal-message">Dziękujemy za kontakt. Skontaktujemy się z Tobą w ciągu 24 godzin.</p>
+            <button class="submit-btn" id="modalOkBtn" onclick="document.getElementById('formModal').style.display = 'none'">OK</button>
         </div>
     </div>
 
     <script>
-        // Funkcje tłumaczenia strony
-        const translations = {
-            pl: {
-                // Sekcja hero
-                main_heading: "MONTAŻ FILMÓW<br>globalcut.pl",
-                hero_subtitle: "Profesjonalna postprodukcja filmowa<br>Precyzja • Kreatywność • Jakość premium",
-                premium_vibe: "Ponad 1000 gotowych realizacji",
-                scroll_hint: "Przewiń w dół",
+        document.addEventListener('DOMContentLoaded', function() {
+            // Obsługa powiększania filmów
+            const videoOverlay = document.getElementById('videoOverlay');
+            const projectCards = document.querySelectorAll('.project-card[data-video-id]');
+            let currentVideoId = null;
+            
+            // Funkcja otwierająca film
+            function openVideo(videoId) {
+                currentVideoId = videoId;
                 
-                // Nawigacja
-                nav_about: "O firmie",
-                nav_portfolio: "Portfolio",
-                nav_pricing: "Cennik",
-                nav_contact: "Kontakt",
+                // Tworzymy kontener dla powiększonego filmu
+                const videoContainer = document.createElement('div');
+                videoContainer.className = 'expanded-video-container';
+                videoContainer.innerHTML = `
+                    <div class="video-controls">
+                        <button class="close-video">×</button>
+                    </div>
+                    <div class="video-player">
+                        <iframe 
+                            src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&controls=1&showinfo=0&iv_load_policy=3&disablekb=1&autoplay=1" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                `;
                 
-                // Sekcje
-                section_about: "Profesjonalny montaż filmowy",
-                section_portfolio: "Nasze realizacje",
-                section_pricing: "Cennik usług",
-                section_contact: "Kontakt",
+                document.body.appendChild(videoContainer);
+                videoOverlay.style.display = 'block';
+                document.body.style.overflow = 'hidden';
                 
-                // Sekcja O firmie
-                about_lead: "Przekształcamy Twoje pomysły w wyjątkowe materiały filmowe, które angażują widzów i osiągają cele biznesowe. Specjalizujemy się w tworzeniu treści, które wyróżniają się na tle konkurencji.",
-                about_expertise_title: "Nasza ekspertyza obejmuje:",
-                about_list_item_1: "<strong>Vlogi i treści personal branding</strong> - budowanie autentycznego wizerunku",
-                about_list_item_2: "<strong>Podcasty i wywiady</strong> - profesjonalne nagrania rozmów i dyskusji",
-                about_list_item_3: "<strong>Filmy szkoleniowe</strong> - efektywne przekazywanie wiedzy i umiejętności",
-                about_list_item_4: "<strong>Materiały reklamowe</strong> - przekonujące treści sprzedażowe",
-                about_list_item_5: "<strong>Treści korporacyjne</strong> - komunikacja wewnętrzna i zewnętrzna firm",
-                about_list_item_6: "<strong>Filmy pamiątkowe</strong> - uchwycenie najważniejszych momentów z wyjazdów i wydarzeń",
-                about_why_title: "Dlaczego warto z nami współpracować:",
-                about_why_1: "Każdy projekt traktujemy jako wyjątkową opowieść, która zasługuje na perfekcyjne wykonanie. Łączymy artystyczną wrażliwość z biznesowym podejściem, dostarczając materiały, które nie tylko wyglądają profesjonalnie, ale przede wszystkim osiągają zamierzone cele.",
-                about_why_2: "Terminowość i dbałość o każdy detal to podstawa naszej pracy.",
-                about_highlight: "<strong>Działamy globalnie</strong> - przyjmujemy zamówienia z całego świata. Bez względu na lokalizację, Twój projekt otrzyma pełne profesjonalne wsparcie i personalne podejście.",
-                about_final: "Gotowi przekuć Twoją wizję w materiał, który wywoła reakcję? Skontaktuj się z nami już dziś.",
+                // Dodajemy obsługę zamykania
+                const closeBtn = videoContainer.querySelector('.close-video');
+                closeBtn.addEventListener('click', closeVideo);
                 
-                // Sekcja Cennik
-                pricing_rolki: "Rolki Social Media",
-                pricing_rolki_price: "80-350 zł",
-                pricing_pamiatkowe: "Filmy Pamiątkowe",
-                pricing_pamiatkowe_price: "200-500 zł",
-                pricing_vlogi: "Vlogi",
-                pricing_vlogi_price: "200-500 zł",
-                pricing_rolki_feature1: "Montaż rolek Instagram/TikTok",
-                pricing_rolki_feature2: "Dynamiczne przejścia i efekty",
-                pricing_rolki_feature3: "Dopasowanie do trendów",
-                pricing_rolki_feature4: "Optymalizacja pod platformy",
-                pricing_rolki_feature5: "Podstawowa korekcja kolorów",
-                pricing_rolki_feature6: "Czas realizacji: 1-3 dni",
-                pricing_pamiatkowe_feature1: "Montaż filmów z wakacji",
-                pricing_pamiatkowe_feature2: "Filmy z imprez i uroczystości",
-                pricing_pamiatkowe_feature3: "Emocjonalna narracja",
-                pricing_pamiatkowe_feature4: "Profesionalna ścieżka dźwiękowa",
-                pricing_pamiatkowe_feature5: "Korekcja kolorów",
-                pricing_pamiatkowe_feature6: "2 rundy poprawek",
-                pricing_pamiatkowe_feature7: "Czas realizacji: 3-7 dni",
-                pricing_vlogi_feature1: "Montaż vlogów do 10 min",
-                pricing_vlogi_feature2: "Dynamiczne tempo narracji",
-                pricing_vlogi_feature3: "Grafiki i napisy",
-                pricing_vlogi_feature4: "Intro i outro",
-                pricing_vlogi_feature5: "Optymalizacja audio",
-                pricing_vlogi_feature6: "Thumbnail do filmu",
-                pricing_vlogi_feature7: "1 runda poprawek",
-                pricing_vlogi_feature8: "Czas realizacji: 3-5 dni",
+                // Dodajemy nasłuchiwanie scrolla na kontenerze filmu
+                videoContainer.addEventListener('wheel', function(e) {
+                    // Zapobiegamy domyślnej akcji scrolla
+                    e.preventDefault();
+                    closeVideo();
+                });
                 
-                cta_title: "Potrzebujesz wyceny?",
-                cta_subtitle: "Każdy projekt jest unikalny. Skontaktuj się z nami, aby otrzymać spersonalizowaną ofertę dostosowaną do Twoich potrzeb.",
-                
-                // Sekcja Kontakt
-                contact_email_title: "Email",
-                contact_phone_title: "Telefon",
-                contact_location_title: "Lokalizacja",
-                contact_facebook_title: "Facebook",
-                contact_facebook_link: "Odwiedź nasz profil",
-                
-                contact_form_title: "Wyślij nam wiadomość",
-                form_label_name: "Imię i nazwisko",
-                form_label_email: "Email",
-                form_label_phone: "Telefon (opcjonalnie)",
-                form_label_message: "Wiadomość",
-                form_button: "Wyślij wiadomość",
-                
-                // Modal
-                modal_title: "Wiadomość wysłana!",
-                modal_message: "Dziękujemy za kontakt. Skontaktujemy się z Tobą w ciągu 24 godzin.",
-                modal_button: "OK"
-            },
-            de: {
-                main_heading: "VIDEOBEARBEITUNG<br>globalcut.pl",
-                hero_subtitle: "Professionelle Film-Postproduktion<br>Präzision • Kreativität • Premium-Qualität",
-                premium_vibe: "Über 1000 fertige Projekte",
-                scroll_hint: "Nach unten scrollen",
-                
-                nav_about: "Über uns",
-                nav_portfolio: "Portfolio",
-                nav_pricing: "Preisliste",
-                nav_contact: "Kontakt",
-                
-                section_about: "Professionelle Videobearbeitung",
-                section_portfolio: "Unsere Projekte",
-                section_pricing: "Preisliste",
-                section_contact: "Kontakt",
-                
-                about_lead: "Wir verwandeln Ihre Ideen in einzigartiges Filmmaterial, das Zuschauer fesselt und Geschäftsziele erreicht. Wir sind spezialisiert auf die Erstellung von Inhalten, die sich von der Konkurrenz abheben.",
-                about_expertise_title: "Unser Fachwissen umfasst:",
-                about_list_item_1: "<strong>Vlogs und Personal Branding</strong> - Aufbau eines authentischen Images",
-                about_list_item_2: "<strong>Podcasts und Interviews</strong> - Professionelle Aufnahmen von Gesprächen und Diskussionen",
-                about_list_item_3: "<strong>Schulungsvideos</strong> - Effektive Vermittlung von Wissen und Fähigkeiten",
-                about_list_item_4: "<strong>Werbeunterlagen</strong> - Überzeugende Verkaufsinhalte",
-                about_list_item_5: "<strong>Unternehmensinhalte</strong> - Interne und externe Unternehmenskommunikation",
-                about_list_item_6: "<strong>Erinnerungsvideos</strong> - Einfangen der wichtigsten Momente von Reisen und Veranstaltungen",
-                about_why_title: "Warum mit uns zusammenarbeiten?",
-                about_why_1: "Jedes Projekt behandeln wir als einzigartige Geschichte, die eine perfekte Ausführung verdient. Wir verbinden künstlerische Sensibilität mit geschäftlichem Ansatz und liefern Materialien, die nicht nur professionell aussehen, sondern vor allem die gesetzten Ziele erreichen.",
-                about_why_2: "Pünktlichkeit und Sorgfalt in jedem Detail sind die Grundlage unserer Arbeit.",
-                about_highlight: "<strong>Wir arbeiten weltweit</strong> - Wir akzeptieren Bestellungen aus der ganzen Welt. Unabhängig vom Standort erhält Ihr Projekt volle professionelle Unterstützung und persönliche Betreuung.",
-                about_final: "Bereit, Ihre Vision in Material umzusetzen, das Reaktionen hervorruft? Kontaktieren Sie uns noch heute.",
-                
-                pricing_rolki: "Social Media Clips",
-                pricing_rolki_price: "20-100 €",
-                pricing_pamiatkowe: "Erinnerungsvideos",
-                pricing_pamiatkowe_price: "50-150 €",
-                pricing_vlogi: "Vlogs",
-                pricing_vlogi_price: "50-150 €",
-                pricing_rolki_feature1: "Bearbeitung von Instagram/TikTok Clips",
-                pricing_rolki_feature2: "Dynamische Übergänge und Effekte",
-                pricing_rolki_feature3: "Anpassung an aktuelle Trends",
-                pricing_rolki_feature4: "Optimierung für Plattformen",
-                pricing_rolki_feature5: "Grundlegende Farbkorrektur",
-                pricing_rolki_feature6: "Bearbeitungszeit: 1-3 Tage",
-                pricing_pamiatkowe_feature1: "Bearbeitung von Urlaubsvideos",
-                pricing_pamiatkowe_feature2: "Videos von Veranstaltungen und Feiern",
-                pricing_pamiatkowe_feature3: "Emotionale Erzählweise",
-                pricing_pamiatkowe_feature4: "Professioneller Soundtrack",
-                pricing_pamiatkowe_feature5: "Farbkorrektur",
-                pricing_pamiatkowe_feature6: "2 Korrekturrunden",
-                pricing_pamiatkowe_feature7: "Bearbeitungszeit: 3-7 Tage",
-                pricing_vlogi_feature1: "Bearbeitung von Vlogs bis 10 Min",
-                pricing_vlogi_feature2: "Dynamische Erzählgeschwindigkeit",
-                pricing_vlogi_feature3: "Grafiken und Untertitel",
-                pricing_vlogi_feature4: "Intro und Outro",
-                pricing_vlogi_feature5: "Audio-Optimierung",
-                pricing_vlogi_feature6: "Thumbnail für das Video",
-                pricing_vlogi_feature7: "1 Korrekturrunde",
-                pricing_vlogi_feature8: "Bearbeitungszeit: 3-5 Tage",
-                
-                cta_title: "Benötigen Sie ein Angebot?",
-                cta_subtitle: "Jedes Projekt ist einzigartig. Kontaktieren Sie uns für ein maßgeschneidertes Angebot, das auf Ihre Bedürfnisse zugeschnitten ist.",
-                
-                contact_email_title: "Email",
-                contact_phone_title: "Telefon",
-                contact_location_title: "Standort",
-                contact_facebook_title: "Facebook",
-                contact_facebook_link: "Besuchen Sie unser Profil",
-                
-                contact_form_title: "Senden Sie uns eine Nachricht",
-                form_label_name: "Name",
-                form_label_email: "Email",
-                form_label_phone: "Telefon (optional)",
-                form_label_message: "Nachricht",
-                form_button: "Nachricht senden",
-                
-                modal_title: "Nachricht gesendet!",
-                modal_message: "Vielen Dank für Ihre Kontaktaufnahme. Wir werden uns innerhalb von 24 Stunden bei Ihnen melden.",
-                modal_button: "OK"
-            },
-            en: {
-                main_heading: "VIDEO EDITING<br>globalcut.pl",
-                hero_subtitle: "Professional Film Post-Production<br>Precision • Creativity • Premium Quality",
-                premium_vibe: "Over 1000 completed projects",
-                scroll_hint: "Scroll down",
-                
-                nav_about: "About",
-                nav_portfolio: "Portfolio",
-                nav_pricing: "Pricing",
-                nav_contact: "Contact",
-                
-                section_about: "Professional Video Editing",
-                section_portfolio: "Our Projects",
-                section_pricing: "Pricing",
-                section_contact: "Contact",
-                
-                about_lead: "We transform your ideas into unique film materials that engage viewers and achieve business goals. We specialize in creating content that stands out from the competition.",
-                about_expertise_title: "Our expertise includes:",
-                about_list_item_1: "<strong>Vlogs and personal branding</strong> - building an authentic image",
-                about_list_item_2: "<strong>Podcasts and interviews</strong> - professional recordings of conversations and discussions",
-                about_list_item_3: "<strong>Training videos</strong> - effective transfer of knowledge and skills",
-                about_list_item_4: "<strong>Advertising materials</strong> - convincing sales content",
-                about_list_item_5: "<strong>Corporate content</strong> - internal and external company communication",
-                about_list_item_6: "<strong>Memorial videos</strong> - capturing the most important moments from trips and events",
-                about_why_title: "Why work with us?",
-                about_why_1: "We treat every project as a unique story that deserves perfect execution. We combine artistic sensitivity with a business approach, delivering materials that not only look professional but above all achieve the intended goals.",
-                about_why_2: "Punctuality and attention to every detail are the foundation of our work.",
-                about_highlight: "<strong>We operate globally</strong> - We accept orders from all over the world. Regardless of location, your project will receive full professional support and personal approach.",
-                about_final: "Ready to turn your vision into material that will evoke a reaction? Contact us today.",
-                
-                pricing_rolki: "Social Media Reels",
-                pricing_rolki_price: "25-100 $",
-                pricing_pamiatkowe: "Memorial Videos",
-                pricing_pamiatkowe_price: "50-150 $",
-                pricing_vlogi: "Vlogs",
-                pricing_vlogi_price: "50-150 $",
-                pricing_rolki_feature1: "Editing Instagram/TikTok reels",
-                pricing_rolki_feature2: "Dynamic transitions and effects",
-                pricing_rolki_feature3: "Trend adaptation",
-                pricing_rolki_feature4: "Platform optimization",
-                pricing_rolki_feature5: "Basic color correction",
-                pricing_rolki_feature6: "Processing time: 1-3 days",
-                pricing_pamiatkowe_feature1: "Editing holiday videos",
-                pricing_pamiatkowe_feature2: "Videos of events and celebrations",
-                pricing_pamiatkowe_feature3: "Emotional narrative",
-                pricing_pamiatkowe_feature4: "Professional soundtrack",
-                pricing_pamiatkowe_feature5: "Color correction",
-                pricing_pamiatkowe_feature6: "2 rounds of corrections",
-                pricing_pamiatkowe_feature7: "Processing time: 3-7 days",
-                pricing_vlogi_feature1: "Editing vlogs up to 10 min",
-                pricing_vlogi_feature2: "Dynamic narrative pace",
-                pricing_vlogi_feature3: "Graphics and subtitles",
-                pricing_vlogi_feature4: "Intro and outro",
-                pricing_vlogi_feature5: "Audio optimization",
-                pricing_vlogi_feature6: "Video thumbnail",
-                pricing_vlogi_feature7: "1 round of corrections",
-                pricing_vlogi_feature8: "Processing time: 3-5 days",
-                
-                cta_title: "Need a quote?",
-                cta_subtitle: "Every project is unique. Contact us for a personalized offer tailored to your needs.",
-                
-                contact_email_title: "Email",
-                contact_phone_title: "Phone",
-                contact_location_title: "Location",
-                contact_facebook_title: "Facebook",
-                contact_facebook_link: "Visit our profile",
-                
-                contact_form_title: "Send us a message",
-                form_label_name: "Name",
-                form_label_email: "Email",
-                form_label_phone: "Phone (optional)",
-                form_label_message: "Message",
-                form_button: "Send message",
-                
-                modal_title: "Message sent!",
-                modal_message: "Thank you for contacting us. We will get back to you within 24 hours.",
-                modal_button: "OK"
+                // Dodajemy nasłuchiwanie scrolla na overlayu
+                videoOverlay.addEventListener('wheel', function(e) {
+                    e.preventDefault();
+                    closeVideo();
+                });
             }
-        };
-
-        // Funkcja aktualizująca język strony
-        function updateLanguage(lang) {
-            // Aktualizuj flagi
-            document.querySelectorAll('.language-flag').forEach(flag => {
-                flag.classList.remove('active');
-                if (flag.getAttribute('data-lang') === lang) {
-                    flag.classList.add('active');
+            
+            // Funkcja zamykająca film
+            function closeVideo() {
+                const videoContainer = document.querySelector('.expanded-video-container');
+                if (videoContainer) {
+                    videoContainer.remove();
                 }
-            });
-            
-            // Aktualizuj treści
-            const langData = translations[lang];
-            document.querySelector('.logo').innerHTML = langData.main_heading;
-            document.querySelector('.hero-subtitle').innerHTML = langData.hero_subtitle;
-            document.querySelector('.premium-vibe').innerHTML = langData.premium_vibe;
-            document.querySelector('.scroll-hint span').textContent = langData.scroll_hint;
-            
-            // Nawigacja
-            document.querySelectorAll('.nav-btn').forEach((btn, index) => {
-                const sections = ['nav_about', 'nav_portfolio', 'nav_pricing', 'nav_contact'];
-                btn.textContent = langData[sections[index]];
-            });
-            
-            // Nagłówki sekcji
-            const sectionIds = ['about', 'portfolio', 'pricing', 'contact'];
-            sectionIds.forEach(id => {
-                const sectionTitle = document.querySelector(`#${id} .section-title`);
-                if (sectionTitle) {
-                    sectionTitle.textContent = langData[`section_${id}`];
-                }
-            });
-            
-            // Sekcja O firmie
-            document.querySelector('.about-content .lead').innerHTML = langData.about_lead;
-            document.querySelector('.about-content h3').textContent = langData.about_expertise_title;
-            
-            const listItems = document.querySelectorAll('.expertise-list li');
-            listItems.forEach((item, index) => {
-                item.innerHTML = langData[`about_list_item_${index + 1}`];
-            });
-            
-            document.querySelectorAll('.about-content h3')[1].textContent = langData.about_why_title;
-            document.querySelectorAll('.about-content .about-text')[0].textContent = langData.about_why_1;
-            document.querySelectorAll('.about-content .about-text')[1].textContent = langData.about_why_2;
-            document.querySelector('.about-content .highlight').innerHTML = langData.about_highlight;
-            document.querySelector('.about-content p:last-child').textContent = langData.about_final;
-            
-            // Sekcja Cennik
-            const priceCards = document.querySelectorAll('.price-card');
-            priceCards.forEach((card, index) => {
-                const titles = ['pricing_rolki', 'pricing_pamiatkowe', 'pricing_vlogi'];
-                card.querySelector('.price-title').textContent = langData[titles[index]];
                 
-                // Aktualizacja cen
-                const priceElement = card.querySelector('.price-amount');
-                priceElement.textContent = langData[`${titles[index]}_price`];
-                
-                // Aktualizacja listy cech
-                const features = card.querySelectorAll('.price-features li');
-                features.forEach((feature, featureIndex) => {
-                    feature.textContent = langData[`${titles[index]}_feature${featureIndex + 1}`];
+                videoOverlay.style.display = 'none';
+                document.body.style.overflow = '';
+                currentVideoId = null;
+            }
+            
+            // Obsługa kliknięcia w karty z filmami
+            projectCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const videoId = this.getAttribute('data-video-id');
+                    if (videoId) {
+                        openVideo(videoId);
+                    }
                 });
             });
             
-            document.querySelector('.cta-title').textContent = langData.cta_title;
-            document.querySelector('.cta-subtitle').textContent = langData.cta_subtitle;
+            // Obsługa kliknięcia poza filmem
+            videoOverlay.addEventListener('click', closeVideo);
             
-            // Sekcja Kontakt
-            const contactTitles = document.querySelectorAll('.contact-title');
-            contactTitles[0].textContent = langData.contact_email_title;
-            contactTitles[1].textContent = langData.contact_phone_title;
-            contactTitles[2].textContent = langData.contact_location_title;
-            contactTitles[3].textContent = langData.contact_facebook_title;
+            // Pozostała funkcjonalność strony
+            const sections = [
+                document.getElementById('hero'),
+                document.getElementById('about'),
+                document.getElementById('portfolio'),
+                document.getElementById('pricing'),
+                document.getElementById('contact')
+            ];
             
-            document.querySelector('.contact-details a').textContent = langData.contact_facebook_link;
-            
-            document.querySelector('#contactFormSection .section-title').textContent = langData.contact_form_title;
-            
-            const formLabels = document.querySelectorAll('.form-group label');
-            formLabels[0].textContent = langData.form_label_name;
-            formLabels[1].textContent = langData.form_label_email;
-            formLabels[2].textContent = langData.form_label_phone;
-            formLabels[3].textContent = langData.form_label_message;
-            
-            document.querySelector('#submitBtn').textContent = langData.form_button;
-            
-            // Modal
-            document.querySelector('.modal-title').textContent = langData.modal_title;
-            document.querySelector('.modal-message').textContent = langData.modal_message;
-            document.querySelector('.modal-content .submit-btn').textContent = langData.modal_button;
-        }
-
-        // Inicjalizacja strony
-        document.addEventListener('DOMContentLoaded', function() {
-            // Navigation functionality
             const navButtons = document.querySelectorAll('.nav-btn');
-            const sections = document.querySelectorAll('.section');
+            const scrollIndicator = document.getElementById('scrollIndicator');
+            let currentSectionIndex = 0;
+            let isScrolling = false;
             
-            // Initialize active section
-            sections.forEach(section => {
-                if (section.id === 'about') {
-                    section.classList.add('active');
-                } else {
-                    section.classList.remove('active');
-                }
+            // Tworzenie kropek nawigacyjnych
+            sections.forEach((section, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'scroll-dot';
+                dot.dataset.index = index;
+                if (index === 0) dot.classList.add('active');
+                
+                dot.addEventListener('click', () => {
+                    scrollToSection(index);
+                });
+                
+                scrollIndicator.appendChild(dot);
             });
             
-            // Navigation button click handler
+            // Funkcja przewijania do sekcji
+            function scrollToSection(index) {
+                if (index < 0 || index >= sections.length || isScrolling) return;
+                
+                isScrolling = true;
+                sections[index].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                
+                // Aktualizuj stan nawigacji
+                updateNavigation(index);
+                
+                setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            }
+            
+            // Aktualizacja nawigacji
+            function updateNavigation(index) {
+                currentSectionIndex = index;
+                
+                // Aktualizuj kropki
+                document.querySelectorAll('.scroll-dot').forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+                
+                // Aktualizuj przyciski w menu
+                const sectionIds = ['about', 'portfolio', 'pricing', 'contact'];
+                if (index > 0) {
+                    const activeSectionId = sectionIds[index-1];
+                    navButtons.forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.section === activeSectionId);
+                    });
+                }
+                
+                // Ukryj wskazówkę przewijania po pierwszej sekcji
+                const scrollHint = document.querySelector('.scroll-hint');
+                if (scrollHint) {
+                    scrollHint.classList.toggle('hidden', index !== 0);
+                }
+            }
+            
+            // Obsługa przycisków nawigacji
             navButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    const targetSectionId = this.getAttribute('data-section');
-                    
-                    // Update active button
-                    navButtons.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Show target section
-                    sections.forEach(section => {
-                        section.classList.remove('active');
-                        if (section.id === targetSectionId) {
-                            section.classList.add('active');
-                            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
-                    });
+                    const targetSection = this.dataset.section;
+                    const sectionIds = ['about', 'portfolio', 'pricing', 'contact'];
+                    const targetIndex = sectionIds.indexOf(targetSection) + 1;
+                    scrollToSection(targetIndex);
                 });
             });
             
-            // Scroll progress bar
-            const progressBar = document.getElementById('progressBar');
-            window.addEventListener('scroll', function() {
-                const scrollTop = window.pageYOffset;
-                const docHeight = document.body.scrollHeight - window.innerHeight;
-                const scrollPercent = (scrollTop / docHeight) * 100;
-                progressBar.style.width = scrollPercent + '%';
+            // Obsługa przewijania kółkiem myszy
+            window.addEventListener('wheel', (e) => {
+                if (isScrolling) return;
+                
+                // Sprawdź, czy użytkownik jest w sekcji portfolio
+                const portfolioSection = document.getElementById('portfolio');
+                const portfolioRect = portfolioSection.getBoundingClientRect();
+                const isInPortfolio = window.scrollY >= portfolioSection.offsetTop && 
+                                      window.scrollY < (portfolioSection.offsetTop + portfolioSection.offsetHeight);
+                
+                if (isInPortfolio) {
+                    // Zezwól na naturalne przewijanie w sekcji portfolio
+                    return;
+                }
+                
+                if (e.deltaY > 50 && currentSectionIndex < sections.length - 1) {
+                    scrollToSection(currentSectionIndex + 1);
+                } else if (e.deltaY < -50 && currentSectionIndex > 0) {
+                    scrollToSection(currentSectionIndex - 1);
+                }
+            }, { passive: false });
+            
+            // Obsługa klawiszy strzałek
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowDown' && currentSectionIndex < sections.length - 1) {
+                    scrollToSection(currentSectionIndex + 1);
+                    e.preventDefault();
+                } else if (e.key === 'ArrowUp' && currentSectionIndex > 0) {
+                    scrollToSection(currentSectionIndex - 1);
+                    e.preventDefault();
+                }
             });
             
-            // Scroll to top button
+            // Inicjalizacja
+            updateNavigation(0);
+            
+            // Przełącznik języków - funkcjonalność
+            const languageFlags = document.querySelectorAll('.language-flag');
+            
+            languageFlags.forEach(flag => {
+                flag.addEventListener('click', function() {
+                    // Usuń klasę active ze wszystkich flag
+                    languageFlags.forEach(f => f.classList.remove('active'));
+                    // Dodaj klasę active do klikniętej flagi
+                    this.classList.add('active');
+                    
+                    const lang = this.dataset.lang;
+                    changeLanguage(lang);
+                });
+            });
+            
+            // Funkcja do zmiany języka
+            function changeLanguage(lang) {
+                // Dodaj klasę animacji do kontenera
+                document.querySelector('.container').classList.add('language-transition');
+                
+                setTimeout(() => {
+                    // Aktualizacja tekstu
+                    document.getElementById('hero-title').textContent = translations[lang].heroTitle;
+                    document.getElementById('hero-subtitle').innerHTML = translations[lang].heroSubtitle;
+                    document.getElementById('premium-vibe').textContent = translations[lang].premiumVibe;
+                    document.getElementById('scroll-text').textContent = translations[lang].scrollText;
+                    
+                    // Aktualizacja nawigacji
+                    document.querySelector('[data-section="about"]').textContent = translations[lang].navAbout;
+                    document.querySelector('[data-section="portfolio"]').textContent = translations[lang].navPortfolio;
+                    document.querySelector('[data-section="pricing"]').textContent = translations[lang].navPricing;
+                    document.querySelector('[data-section="contact"]').textContent = translations[lang].navContact;
+                    
+                    // Aktualizacja sekcji "O firmie"
+                    document.getElementById('about-title').textContent = translations[lang].aboutTitle;
+                    document.getElementById('about-lead').textContent = translations[lang].aboutLead;
+                    document.getElementById('expertise-title').textContent = translations[lang].expertiseTitle;
+                    document.getElementById('why-title').textContent = translations[lang].whyTitle;
+                    document.getElementById('why-text').textContent = translations[lang].whyText;
+                    document.getElementById('timeliness-text').textContent = translations[lang].timelinessText;
+                    document.getElementById('global-text').innerHTML = translations[lang].globalText;
+                    document.getElementById('contact-text').textContent = translations[lang].contactText;
+                    
+                    // Aktualizacja listy ekspertyzy
+                    const expertiseList = document.getElementById('expertise-list');
+                    expertiseList.innerHTML = '';
+                    translations[lang].expertiseItems.forEach(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = item;
+                        expertiseList.appendChild(li);
+                    });
+                    
+                    // Aktualizacja cen
+                    convertPrices(lang);
+                    
+                    // Aktualizacja sekcji portfolio
+                    document.getElementById('portfolio-title').textContent = translations[lang].portfolioTitle;
+                    
+                    // Aktualizacja sekcji cennika
+                    document.getElementById('pricing-title').textContent = translations[lang].pricingTitle;
+                    document.getElementById('price-title-1').textContent = translations[lang].priceTitle1;
+                    document.getElementById('price-title-2').textContent = translations[lang].priceTitle2;
+                    document.getElementById('price-title-3').textContent = translations[lang].priceTitle3;
+                    
+                    const priceFeatures1 = document.getElementById('price-features-1');
+                    priceFeatures1.innerHTML = '';
+                    translations[lang].priceFeatures1.forEach(feature => {
+                        const li = document.createElement('li');
+                        li.innerHTML = feature;
+                        priceFeatures1.appendChild(li);
+                    });
+                    
+                    const priceFeatures2 = document.getElementById('price-features-2');
+                    priceFeatures2.innerHTML = '';
+                    translations[lang].priceFeatures2.forEach(feature => {
+                        const li = document.createElement('li');
+                        li.innerHTML = feature;
+                        priceFeatures2.appendChild(li);
+                    });
+                    
+                    const priceFeatures3 = document.getElementById('price-features-3');
+                    priceFeatures3.innerHTML = '';
+                    translations[lang].priceFeatures3.forEach(feature => {
+                        const li = document.createElement('li');
+                        li.innerHTML = feature;
+                        priceFeatures3.appendChild(li);
+                    });
+                    
+                    document.getElementById('cta-title').textContent = translations[lang].ctaTitle;
+                    document.getElementById('cta-subtitle').textContent = translations[lang].ctaSubtitle;
+                    
+                    // Aktualizacja sekcji kontaktów
+                    document.getElementById('contact-title').textContent = translations[lang].contactTitle;
+                    document.getElementById('email-title').textContent = translations[lang].emailTitle;
+                    document.getElementById('phone-title').textContent = translations[lang].phoneTitle;
+                    document.getElementById('whatsapp-text').textContent = translations[lang].whatsappText;
+                    document.getElementById('location-title').textContent = translations[lang].locationTitle;
+                    document.getElementById('facebook-title').textContent = translations[lang].facebookTitle;
+                    document.getElementById('visit-text').textContent = translations[lang].visitText;
+                    
+                    document.getElementById('form-title').textContent = translations[lang].formTitle;
+                    document.getElementById('name-label').textContent = translations[lang].nameLabel;
+                    document.getElementById('email-label').textContent = translations[lang].emailLabel;
+                    document.getElementById('phone-label').textContent = translations[lang].phoneLabel;
+                    document.getElementById('message-label').textContent = translations[lang].messageLabel;
+                    document.getElementById('submitBtn').textContent = translations[lang].submitBtn;
+                    
+                    // Aktualizacja modala
+                    document.getElementById('modal-title').textContent = translations[lang].modalTitle;
+                    document.getElementById('modal-message').textContent = translations[lang].modalMessage;
+                    document.getElementById('modalOkBtn').textContent = translations[lang].modalOk;
+                    
+                    // Usuń klasę animacji po zakończeniu
+                    setTimeout(() => {
+                        document.querySelector('.container').classList.remove('language-transition');
+                    }, 500);
+                }, 10);
+            }
+            
+            // Funkcja konwersji cen PLN na EUR lub USD
+            function convertPrices(lang) {
+                const EXCHANGE_RATE_EUR = 0.23; // Kurs wymiany PLN na EUR (przykładowy)
+                const EXCHANGE_RATE_USD = 0.25; // Kurs wymiany PLN na USD (przykładowy)
+                const priceElements = document.querySelectorAll('.price-amount');
+                
+                priceElements.forEach(element => {
+                    const pricePLN = element.getAttribute('data-price-pln');
+                    if (pricePLN) {
+                        if (lang === 'pl') {
+                            element.textContent = pricePLN + ' zł';
+                        } else if (lang === 'en') {
+                            // Konwersja na dolary amerykańskie
+                            const [minPLN, maxPLN] = pricePLN.split('-').map(Number);
+                            const minUSD = Math.round(minPLN * EXCHANGE_RATE_USD);
+                            const maxUSD = Math.round(maxPLN * EXCHANGE_RATE_USD);
+                            element.textContent = minUSD + '-' + maxUSD + ' $';
+                        } else {
+                            // Dla innych języków (np. niemiecki) konwersja na euro
+                            const [minPLN, maxPLN] = pricePLN.split('-').map(Number);
+                            const minEUR = Math.round(minPLN * EXCHANGE_RATE_EUR);
+                            const maxEUR = Math.round(maxPLN * EXCHANGE_RATE_EUR);
+                            element.textContent = minEUR + '-' + maxEUR + ' €';
+                        }
+                    }
+                });
+            }
+            
+            // Formularz kontaktowy
+            const contactForm = document.getElementById('contactForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const formModal = document.getElementById('formModal');
+            
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    submitBtn.classList.add('sending');
+                    submitBtn.disabled = true;
+                    
+                    setTimeout(function() {
+                        contactForm.reset();
+                        submitBtn.classList.remove('sending');
+                        submitBtn.disabled = false;
+                        formModal.style.display = 'flex';
+                    }, 1500);
+                });
+            }
+            
+            document.getElementById('closeFormModal').addEventListener('click', function() {
+                formModal.style.display = 'none';
+            });
+            
+            // Przycisk powrotu do góry
             const scrollToTopBtn = document.getElementById('scrollToTop');
             window.addEventListener('scroll', function() {
                 if (window.pageYOffset > 300) {
@@ -1969,42 +2304,21 @@
                     top: 0,
                     behavior: 'smooth'
                 });
+                scrollToSection(0);
             });
             
-            // Form handling
-            const contactForm = document.getElementById('contactForm');
-            const submitBtn = document.getElementById('submitBtn');
-            const formModal = document.getElementById('formModal');
-            
-            if (contactForm) {
-                contactForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    // Show loading state
-                    submitBtn.classList.add('sending');
-                    submitBtn.disabled = true;
-                    
-                    // Form submission logic
-                    setTimeout(function() {
-                        // Reset form
-                        contactForm.reset();
-                        
-                        // Hide loading state
-                        submitBtn.classList.remove('sending');
-                        submitBtn.disabled = false;
-                        
-                        // Show success modal
-                        formModal.style.display = 'flex';
-                    }, 1500);
-                });
-            }
-            
-            // Close modal
-            document.getElementById('closeFormModal').addEventListener('click', function() {
-                formModal.style.display = 'none';
+            // Pasek postępu
+            const progressBar = document.getElementById('progressBar');
+            window.addEventListener('scroll', function() {
+                const scrollTop = window.pageYOffset;
+                const docHeight = document.body.scrollHeight - window.innerHeight;
+                const scrollPercent = (scrollTop / docHeight) * 100;
+                progressBar.style.width = scrollPercent + '%';
             });
+
+            // Animacje fade-in dla elementów przy przewijaniu
+            const fadeElements = document.querySelectorAll('.fade-in');
             
-            // Intersection Observer for animations
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -2012,31 +2326,282 @@
                     }
                 });
             }, {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
+                threshold: 0.1
             });
             
-            document.querySelectorAll('.fade-in').forEach(el => {
-                observer.observe(el);
+            fadeElements.forEach(element => {
+                observer.observe(element);
             });
-            
-            // Dodano obsługę przełącznika języków
-            document.querySelectorAll('.language-flag').forEach(flag => {
-                flag.addEventListener('click', function() {
-                    const lang = this.getAttribute('data-lang');
-                    updateLanguage(lang);
-                });
-            });
-            
-            // Ustaw domyślny język
-            updateLanguage('pl');
         });
         
-        // Activate contact section function
+        // Obiekt z tłumaczeniami dla wszystkich języków
+        const translations = {
+            pl: {
+                heroTitle: "MONTAŻ FILMÓW",
+                heroSubtitle: "Profesjonalna postprodukcja filmowa<br>Precyzja • Kreatywność • Jakość premium",
+                premiumVibe: "Ponad 1000 gotowych realizacji",
+                scrollText: "Przewiń w dół",
+                
+                navAbout: "O firmie",
+                navPortfolio: "Portfolio",
+                navPricing: "Cennik",
+                navContact: "Kontakt",
+                
+                aboutTitle: "Profesjonalny montaż filmowy",
+                aboutLead: "Przekształcamy Twoje pomysły w wyjątkowe materiały filmowe, które angażują widzów i osiągają cele biznesowe. Specjalizujemy się w tworzeniu treści, które wyróżniają się na tle konkurencji.",
+                expertiseTitle: "Nasza ekspertyza obejmuje:",
+                expertiseItems: [
+                    "<strong>Vlogi i treści personal branding</strong> - budowanie autentycznego wizerunku",
+                    "<strong>Podcasty i wywiady</strong> - profesjonalne nagrania rozmów i dyskusji",
+                    "<strong>Filmy szkoleniowe</strong> - efektywne przekazywanie wiedzy i umiejętności",
+                    "<strong>Materiały reklamowe</strong> - przekonujące treści sprzedażowe",
+                    "<strong>Treści korporacyjne</strong> - komunikacja wewnętrzna i zewnętrzna firm",
+                    "<strong>Filmy pamiątkowe</strong> - uchwycenie najważniejszych momentów z wyjazdów i wydarzeń"
+                ],
+                whyTitle: "Dlaczego warto z nami współpracować:",
+                whyText: "Każdy projekt traktujemy jako wyjątkową opowieść, która zasługuje na perfekcyjne wykonację. Łączymy artystyczną wrażliwość z biznesowym podejściem, dostarczając materiały, które nie tylko wyglądają profesjonalnie, ale przede wszystkim osiągają zamierzone cele.",
+                timelinessText: "Terminowość i dbałość o każdy detal to podstawa naszej pracy.",
+                globalText: "<strong>Działamy globalnie</strong> - przyjmujemy zamówienia z całego świata. Bez względu na lokalizację, Twój projekt otrzyma pełne profesjonalne wsparcie i personalne podejście.",
+                contactText: "Gotowi przekuć Twoją wizję w materiał, który wywoła reakcję? Skontaktuj się z nami już dziś.",
+                
+                portfolioTitle: "Nasze realizacje",
+                
+                pricingTitle: "Cennik usług",
+                priceTitle1: "Rolki Social Media",
+                priceFeatures1: [
+                    "Montaż rolek Instagram/TikTok",
+                    "Dynamiczne przejścia i efekty",
+                    "Dopasowanie do trendów",
+                    "Optymalizacja pod platformy",
+                    "Podstawowa korekcja kolorów",
+                    "Czas realizacji: 1-3 dni"
+                ],
+                priceTitle2: "Filmy Pamiątkowe",
+                priceFeatures2: [
+                    "Montaż filmów z wakacji",
+                    "Filmy z imprez i uroczystości",
+                    "Emocjonalna narracja",
+                    "Profesjonalna ścieżka dźwiękowa",
+                    "Korekcja kolorów",
+                    "2 rundy poprawek",
+                    "Czas realizacji: 3-7 dni"
+                ],
+                priceTitle3: "Vlogi",
+                priceFeatures3: [
+                    "Montaż vlogów do 10 min",
+                    "Dynamiczne tempo narracji",
+                    "Grafiki i napisy",
+                    "Intro i outro",
+                    "Optymalizacja audio",
+                    "Thumbnail do filmu",
+                    "1 runda poprawek",
+                    "Czas realizacji: 3-5 dni"
+                ],
+                ctaTitle: "Potrzebujesz wyceny?",
+                ctaSubtitle: "Każdy projekt jest unikalny. Skontaktuj się z nami, aby otrzymać spersonalizowaną ofertę dostosowaną do Twoich potrzeb.",
+                
+                contactTitle: "Kontakt",
+                emailTitle: "E-mail",
+                phoneTitle: "Telefon",
+                whatsappText: "WhatsApp",
+                locationTitle: "Lokalizacja",
+                facebookTitle: "Facebook",
+                visitText: "Odwiedź nasz profil",
+                formTitle: "Wyślij nam wiadomość",
+                nameLabel: "Imię i nazwisko",
+                emailLabel: "E-mail",
+                phoneLabel: "Telefon (opcjonalnie)",
+                messageLabel: "Wiadomość",
+                submitBtn: "Wyślij wiadomość",
+                
+                modalTitle: "Wiadomość wysłana!",
+                modalMessage: "Dziękujemy za kontakt. Skontaktujemy się z Tobą w ciągu 24 godzin.",
+                modalOk: "OK"
+            },
+            de: {
+                heroTitle: "FILMBEARBEITUNG",
+                heroSubtitle: "Professionelle Filmproduktion<br>Präzision • Kreativität • Premium-Qualität",
+                premiumVibe: "Über 1000 fertige Realisierungen",
+                scrollText: "Nach unten scrollen",
+                
+                navAbout: "Über uns",
+                navPortfolio: "Portfolio",
+                navPricing: "Preisgestaltung",
+                navContact: "Kontakt",
+                
+                aboutTitle: "Professionelle Filmproduktion",
+                aboutLead: "Wir verwandeln Ihre Ideen in einzigartige Filmmaterialien, die Zuschauer einbeziehen und Geschäftsziele erreichen. Wir sind auf die Erstellung von Inhalten spezialisiert, die sich von der Konkurrenz abheben.",
+                expertiseTitle: "Unsere Expertise umfasst:",
+                expertiseItems: [
+                    "<strong>Vlogs und Personal Branding-Inhalte</strong> - Aufbau eines authentischen Images",
+                    "<strong>Podcasts und Interviews</strong> - Professionelle Aufzeichnung von Gesprächen und Diskussionen",
+                    "<strong>Schulungsvideos</strong> - Effiziente Vermittlung von Wissen und Fähigkeiten",
+                    "<strong>Werbeunterlagen</strong> - Überzeugende Verkaufsinhalte",
+                    "<strong>Unternehmensinhalte</strong> - Interne und externe Unternehmenskommunikation",
+                    "<strong>Erinnerungsvideos</strong> - Festhalten der wichtigsten Momente von Reisen und Veranstaltungen"
+                ],
+                whyTitle: "Warum mit us zusammenarbeiten?",
+                whyText: "Wir behandeln jedes Projekt als eine einzigartige Geschichte, die eine perfekte Ausführung verdient. Wir verbinden künstlerische Sensibilität mit einem geschäftlichen Ansatz und liefern Materialien, die nicht nur professionell aussehen, sondern vor allem die gesetzten Ziele erreichen.",
+                timelinessText: "Pünktlichkeit und Sorgfalt für jedes Detail sind die Grundlagen unserer Arbeit.",
+                globalText: "<strong>Wir arbeiten weltweit</strong> - Wir nehmen Bestellungen aus der ganzen Welt entgegen. Unabhängig vom Standort erhält Ihr Projekt umfassende professionelle Unterstützung und einen persönlichen Ansatz.",
+                contactText: "Bereit, Ihre Vision in Material zu verwandeln, das Reaktionen hervorruft? Kontaktieren Sie uns noch heute.",
+                
+                portfolioTitle: "Unsere Projekte",
+                
+                pricingTitle: "Preisliste",
+                priceTitle1: "Social Media Rollen",
+                priceFeatures1: [
+                    "Bearbeitung von Instagram/TikTok Rollen",
+                    "Dynamische Übergänge und Effekte",
+                    "Anpassung an Trends",
+                    "Optimierung für Plattformen",
+                    "Grundlegende Farbkorrektur",
+                    "Bearbeitungszeit: 1-3 Tage"
+                ],
+                priceTitle2: "Erinnerungsfilme",
+                priceFeatures2: [
+                    "Bearbeitung von Urlaubsvideos",
+                    "Filme von Veranstaltungen und Feiern",
+                    "Emotionale Erzählung",
+                    "Professioneller Soundtrack",
+                    "Farbkorrektur",
+                    "2 Korrekturrunden",
+                    "Bearbeitungszeit: 3-7 Tage"
+                ],
+                priceTitle3: "Vlogs",
+                priceFeatures3: [
+                    "Bearbeitung von Vlogs bis zu 10 Minuten",
+                    "Dynamisches Erzähltempo",
+                    "Grafiken und Untertitel",
+                    "Intro und Outro",
+                    "Audiooptimierung",
+                    "Thumbnail für das Video",
+                    "1 Korrekturrunde",
+                    "Bearbeitungszeit: 3-5 Tage"
+                ],
+                ctaTitle: "Benötigen Sie ein Angebot?",
+                ctaSubtitle: "Jedes Projekt ist einzigartig. Kontaktieren Sie uns für ein personalisiertes Angebot, das auf Ihre Bedürfnisse zugeschnitten ist.",
+                
+                contactTitle: "Kontakt",
+                emailTitle: "E-Mail",
+                phoneTitle: "Telefon",
+                whatsappText: "WhatsApp",
+                locationTitle: "Standort",
+                facebookTitle: "Facebook",
+                visitText: "Besuchen Sie unser Profil",
+                formTitle: "Senden Sie uns eine Nachricht",
+                nameLabel: "Vor- und Nachname",
+                emailLabel: "E-Mail",
+                phoneLabel: "Telefon (optional)",
+                messageLabel: "Nachricht",
+                submitBtn: "Nachricht senden",
+                
+                modalTitle: "Nachricht gesendet!",
+                modalMessage: "Vielen Dank für Ihre Kontaktaufnahme. Wir werden uns innerhalb von 24 Stunden bei Ihnen melden.",
+                modalOk: "OK"
+            },
+            en: {
+                heroTitle: "VIDEO EDITING",
+                heroSubtitle: "Professional film production<br>Precision • Creativity • Premium quality",
+                premiumVibe: "Over 1000 completed projects",
+                scrollText: "Scroll down",
+                
+                navAbout: "About",
+                navPortfolio: "Portfolio",
+                navPricing: "Pricing",
+                navContact: "Contact",
+                
+                aboutTitle: "Professional Video Editing",
+                aboutLead: "We transform your ideas into unique video materials that engage viewers and achieve business goals. We specialize in creating content that stands out from the competition.",
+                expertiseTitle: "Our expertise includes:",
+                expertiseItems: [
+                    "<strong>Vlogs and personal branding content</strong> - Building an authentic image",
+                    "<strong>Podcasts and interviews</strong> - Professional recording of conversations and discussions",
+                    "<strong>Training films</strong> - Efficient transfer of knowledge and skills",
+                    "<strong>Advertising materials</strong> - Persuasive sales content",
+                    "<strong>Corporate content</strong> - Internal and external company communication",
+                    "<strong>Memorable films</strong> - Capturing the most important moments from trips and events"
+                ],
+                whyTitle: "Why work with us?",
+                whyText: "We treat every project as a unique story that deserves perfect execution. We combine artistic sensitivity with a business approach, delivering materials that not only look professional but above all achieve the intended goals.",
+                timelinessText: "Timeliness and attention to every detail are the foundations of our work.",
+                globalText: "<strong>We operate globally</strong> - We accept orders from all over the world. Regardless of location, your project will receive full professional support and a personal approach.",
+                contactText: "Ready to turn your vision into material that will evoke a reaction? Contact us today.",
+                
+                portfolioTitle: "Our Projects",
+                
+                pricingTitle: "Price List",
+                priceTitle1: "Social Media Reels",
+                priceFeatures1: [
+                    "Editing Instagram/TikTok reels",
+                    "Dynamic transitions and effects",
+                    "Trend adaptation",
+                    "Platform optimization",
+                    "Basic color correction",
+                    "Completion time: 1-3 days"
+                ],
+                priceTitle2: "Memorable Films",
+                priceFeatures2: [
+                    "Editing vacation videos",
+                    "Films from events and celebrations",
+                    "Emotional narrative",
+                    "Professional soundtrack",
+                    "Color correction",
+                    "2 rounds of corrections",
+                    "Completion time: 3-7 days"
+                ],
+                priceTitle3: "Vlogs",
+                priceFeatures3: [
+                    "Editing vlogs up to 10 minutes",
+                    "Dynamic narrative pace",
+                    "Graphics and subtitles",
+                    "Intro and outro",
+                    "Audio optimization",
+                    "Video thumbnail",
+                    "1 round of corrections",
+                    "Completion time: 3-5 days"
+                ],
+                ctaTitle: "Need a quote?",
+                ctaSubtitle: "Every project is unique. Contact us for a personalized offer tailored to your needs.",
+                
+                contactTitle: "Contact",
+                emailTitle: "Email",
+                phoneTitle: "Phone",
+                whatsappText: "WhatsApp",
+                locationTitle: "Location",
+                facebookTitle: "Facebook",
+                visitText: "Visit our profile",
+                formTitle: "Send us a message",
+                nameLabel: "Full name",
+                emailLabel: "Email",
+                phoneLabel: "Phone (optional)",
+                messageLabel: "Message",
+                submitBtn: "Send message",
+                
+                modalTitle: "Message sent!",
+                modalMessage: "Thank you for contacting us. We will get back to you within 24 hours.",
+                modalOk: "OK"
+            }
+        };
+        
         function activateContactSection() {
-            const contactButton = document.querySelector('.nav-btn[data-section="contact"]');
-            if (contactButton) {
-                contactButton.click();
+            scrollToSection(4);
+        }
+        
+        function scrollToSection(index) {
+            const sections = [
+                document.getElementById('hero'),
+                document.getElementById('about'),
+                document.getElementById('portfolio'),
+                document.getElementById('pricing'),
+                document.getElementById('contact')
+            ];
+            
+            if (index >= 0 && index < sections.length) {
+                sections[index].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
             }
         }
     </script>
