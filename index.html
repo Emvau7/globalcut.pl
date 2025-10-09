@@ -2270,32 +2270,27 @@
                 });
             }
             
-            // FORMULARZ KONTAKTOWY Z FORMSUBMIT
-            const contactForm = document.getElementById('contactForm');
-            const submitBtn = document.getElementById('submitBtn');
-            const formModal = document.getElementById('formModal');
-            
-            if (contactForm) {
-                contactForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    submitBtn.classList.add('sending');
-                    submitBtn.disabled = true;
-                    
-                    // Wyślij formularz
-                    setTimeout(function() {
-                        contactForm.submit();
-                    }, 1000);
-                    
-                    // Pokaż modal sukcesu
-                    setTimeout(function() {
-                        contactForm.reset();
-                        submitBtn.classList.remove('sending');
-                        submitBtn.disabled = false;
-                        formModal.style.display = 'flex';
-                    }, 1500);
-                });
-            }
+// FORMULARZ KONTAKTOWY Z FORMSUBMIT.CO
+const contactForm = document.getElementById('contactForm');
+const submitBtn = document.getElementById('submitBtn');
+const formModal = document.getElementById('formModal');
+
+if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+        // NIE używamy e.preventDefault() - pozwalamy formularzowi wysłać się normalnie
+        
+        submitBtn.classList.add('sending');
+        submitBtn.disabled = true;
+        
+        // Pokaż modal sukcesu (z opóźnieniem, bo formularz się przesyła)
+        setTimeout(function() {
+            contactForm.reset();
+            formModal.style.display = 'flex';
+            submitBtn.classList.remove('sending');
+            submitBtn.disabled = false;
+        }, 2000);
+    });
+}
             
             document.getElementById('closeFormModal').addEventListener('click', function() {
                 formModal.style.display = 'none';
