@@ -2269,27 +2269,43 @@
                 });
             }
             
-// FORMULARZ KONTAKTOWY Z FORMSUBMIT.CO
-const contactForm = document.getElementById('contactForm');
-const submitBtn = document.getElementById('submitBtn');
-const formModal = document.getElementById('formModal');
-
-if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
-        // NIE używamy e.preventDefault() - pozwalamy formularzowi wysłać się normalnie
-        
-        submitBtn.classList.add('sending');
-        submitBtn.disabled = true;
-        
-        // Pokaż modal sukcesu (z opóźnieniem, bo formularz się przesyła)
-        setTimeout(function() {
-            contactForm.reset();
-            formModal.style.display = 'flex';
-            submitBtn.classList.remove('sending');
-            submitBtn.disabled = false;
-        }, 2000);
-    });
-}
+            // FORMULARZ KONTAKTOWY Z FORMSUBMIT.CO (AJAX)
+            const contactForm = document.getElementById('contactForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const formModal = document.getElementById('formModal');
+            
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    submitBtn.classList.add('sending');
+                    submitBtn.disabled = true;
+                    
+                    // Zbierz dane z formularza
+                    const formData = new FormData(contactForm);
+                    
+                    // Wyślij przez AJAX
+                    fetch('https://formsubmit.co/ajax/mat@globalcut.pl', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Sukces - pokaż modal
+                        contactForm.reset();
+                        formModal.style.display = 'flex';
+                        submitBtn.classList.remove('sending');
+                        submitBtn.disabled = false;
+                    })
+                    .catch(error => {
+                        // Błąd
+                        console.error('Error:', error);
+                        alert('Wystąpił błąd podczas wysyłania wiadomości. Spróbuj ponownie.');
+                        submitBtn.classList.remove('sending');
+                        submitBtn.disabled = false;
+                    });
+                });
+            }
             
             document.getElementById('closeFormModal').addEventListener('click', function() {
                 formModal.style.display = 'none';
