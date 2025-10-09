@@ -1889,7 +1889,10 @@
             
             <div class="contact-form fade-in visible" id="contactFormSection">
                 <h3 class="section-title" style="font-size: clamp(1.2rem, 3vw, 1.5rem); margin-bottom: clamp(1.5rem, 3vw, 2rem);" id="form-title">Wyślij nam wiadomość</h3>
-                <form id="contactForm" action="https://formspree.io/f/mjvnyvzw" method="POST">
+                <!-- FORMULARZ Z FORMSUBMIT -->
+                <form id="contactForm" action="https://formsubmit.io/mateuszjanczura1999@gmail.com" method="POST">
+                    <input type="hidden" name="_subject" value="Nowa wiadomość z globalcut.pl">
+                    <input type="hidden" name="_template" value="basic">
                     <div class="form-group">
                         <label for="name" id="name-label">Imię i nazwisko</label>
                         <input type="text" id="name" name="name" required>
@@ -1920,7 +1923,7 @@
             <div class="modal-icon">📧</div>
             <h3 class="modal-title" id="modal-title">Wiadomość wysłana!</h3>
             <p class="modal-message" id="modal-message">Dziękujemy za kontakt. Skontaktujemy się z Tobą w ciągu 24 godzin.</p>
-            <button class="submit-btn" id="modalOkBtn" onclick="document.getElementById('formModal').style.display = 'none'">OK</button>
+            <button class="submit-btn" id="modalOkBtn">OK</button>
         </div>
     </div>
 
@@ -2264,7 +2267,7 @@
                 });
             }
             
-            // Formularz kontaktowy
+            // FORMULARZ KONTAKTOWY Z FORMSUBMIT
             const contactForm = document.getElementById('contactForm');
             const submitBtn = document.getElementById('submitBtn');
             const formModal = document.getElementById('formModal');
@@ -2276,6 +2279,12 @@
                     submitBtn.classList.add('sending');
                     submitBtn.disabled = true;
                     
+                    // Wyślij formularz
+                    setTimeout(function() {
+                        contactForm.submit();
+                    }, 1000);
+                    
+                    // Pokaż modal sukcesu
                     setTimeout(function() {
                         contactForm.reset();
                         submitBtn.classList.remove('sending');
@@ -2286,6 +2295,10 @@
             }
             
             document.getElementById('closeFormModal').addEventListener('click', function() {
+                formModal.style.display = 'none';
+            });
+            
+            document.getElementById('modalOkBtn').addEventListener('click', function() {
                 formModal.style.display = 'none';
             });
             
@@ -2386,7 +2399,7 @@
                     "2 rundy poprawek",
                     "Czas realizacji: 3-7 dni"
                 ],
-                priceTitle3: "Vlogi",
+                priceTitle3: "Vlogs",
                 priceFeatures3: [
                     "Montaż vlogów do 10 min",
                     "Dynamiczne tempo narracji",
