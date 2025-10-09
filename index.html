@@ -1889,28 +1889,31 @@
             
             <div class="contact-form fade-in visible" id="contactFormSection">
                 <h3 class="section-title" style="font-size: clamp(1.2rem, 3vw, 1.5rem); margin-bottom: clamp(1.5rem, 3vw, 2rem);" id="form-title">Wyślij nam wiadomość</h3>
-                <!-- FORMULARZ Z FORMSUBMIT -->
-                <form id="contactForm" action="https://formsubmit.io/mateuszjanczura1999@gmail.com" method="POST">
-                    <input type="hidden" name="_subject" value="Nowa wiadomość z globalcut.pl">
-                    <input type="hidden" name="_template" value="basic">
-                    <div class="form-group">
-                        <label for="name" id="name-label">Imię i nazwisko</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email" id="email-label">Email</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone" id="phone-label">Telefon (opcjonalnie)</label>
-                        <input type="tel" id="phone" name="phone">
-                    </div>
-                    <div class="form-group">
-                        <label for="message" id="message-label">Wiadomość</label>
-                        <textarea id="message" name="message" required></textarea>
-                    </div>
-                    <button type="submit" class="submit-btn" id="submitBtn">Wyślij wiadomość</button>
-                </form>
+<!-- FORMULARZ Z FORMSUBMIT.CO -->
+<form id="contactForm" action="https://formsubmit.co/mat@globalcut.pl" method="POST">
+    <input type="hidden" name="_subject" value="Nowa wiadomość z globalcut.pl">
+    <input type="hidden" name="_template" value="table">
+    <input type="hidden" name="_captcha" value="false">
+    <input type="hidden" name="_next" value="https://globalcut.pl#contact">
+    
+    <div class="form-group">
+        <label for="name" id="name-label">Imię i nazwisko</label>
+        <input type="text" id="name" name="name" required>
+    </div>
+    <div class="form-group">
+        <label for="email" id="email-label">Email</label>
+        <input type="email" id="email" name="email" required>
+    </div>
+    <div class="form-group">
+        <label for="phone" id="phone-label">Telefon (opcjonalnie)</label>
+        <input type="tel" id="phone" name="phone">
+    </div>
+    <div class="form-group">
+        <label for="message" id="message-label">Wiadomość</label>
+        <textarea id="message" name="message" required></textarea>
+    </div>
+    <button type="submit" class="submit-btn" id="submitBtn">Wyślij wiadomość</button>
+</form>
             </div>
         </section>
     </div>
