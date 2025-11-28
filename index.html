@@ -1953,7 +1953,7 @@
 
                 <div class="price-card fade-in visible">
                     <h3 class="price-title" id="price-title-3">Vlogi</h3>
-                    <div class="price-amount" data-price-pln="200-500">200-500 zł</div>
+                    <div class="price-amount" data-price-pln="200-1000">200-1000 zł</div>
                     <ul class="price-features" id="price-features-3">
                         <li>Montaż vlogów do 10 min</li>
                         <li>Dynamiczne tempo narracji</li>
@@ -2380,15 +2380,25 @@
                         } else if (lang === 'en') {
                             // Konwersja na dolary amerykańskie
                             const [minPLN, maxPLN] = pricePLN.split('-').map(Number);
-                            const minUSD = Math.round(minPLN * EXCHANGE_RATE_USD);
-                            const maxUSD = Math.round(maxPLN * EXCHANGE_RATE_USD);
-                            element.textContent = minUSD + '-' + maxUSD + ' $';
+                            // Specjalna obsługa dla vlogów (200-1000 PLN)
+                            if (minPLN === 200 && maxPLN === 1000) {
+                                element.textContent = '50-250 $';
+                            } else {
+                                const minUSD = Math.round(minPLN * EXCHANGE_RATE_USD);
+                                const maxUSD = Math.round(maxPLN * EXCHANGE_RATE_USD);
+                                element.textContent = minUSD + '-' + maxUSD + ' $';
+                            }
                         } else {
                             // Dla innych języków (np. niemiecki) konwersja na euro
                             const [minPLN, maxPLN] = pricePLN.split('-').map(Number);
-                            const minEUR = Math.round(minPLN * EXCHANGE_RATE_EUR);
-                            const maxEUR = Math.round(maxPLN * EXCHANGE_RATE_EUR);
-                            element.textContent = minEUR + '-' + maxEUR + ' €';
+                            // Specjalna obsługa dla vlogów (200-1000 PLN)
+                            if (minPLN === 200 && maxPLN === 1000) {
+                                element.textContent = '50-250 €';
+                            } else {
+                                const minEUR = Math.round(minPLN * EXCHANGE_RATE_EUR);
+                                const maxEUR = Math.round(maxPLN * EXCHANGE_RATE_EUR);
+                                element.textContent = minEUR + '-' + maxEUR + ' €';
+                            }
                         }
                     }
                 });
