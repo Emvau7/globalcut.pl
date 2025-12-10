@@ -1425,6 +1425,46 @@
             overflow: hidden;
         }
         
+        /* NOWE STYLE DLA PRZYCISKU WHATSAPP (zawsze widoczny) */
+        #whatsappButton {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            z-index: 1000;
+            animation: whatsappFadeIn 0.5s ease-out 0.5s forwards;
+            opacity: 0;
+        }
+
+        @keyframes whatsappFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #whatsappButton a {
+            background: #25D366;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        #whatsappButton a:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+        }
+
         /* Responsywność */
         @media (max-width: 1200px) {
             .project-thumbnail {
@@ -1498,6 +1538,17 @@
                 position: relative;
                 margin: 0 auto;
             }
+
+            /* WhatsApp na telefonach */
+            #whatsappButton {
+                bottom: 80px;
+                right: 15px;
+            }
+            
+            #whatsappButton a {
+                padding: 0.8rem 1.2rem;
+                font-size: 0.9rem;
+            }
         }
 
         @media (max-width: 576px) {
@@ -1554,6 +1605,25 @@
                 height: 50px;
                 font-size: 2rem;
             }
+
+            /* WhatsApp na małych telefonach */
+            #whatsappButton {
+                bottom: 70px;
+                right: 10px;
+            }
+            
+            #whatsappButton a {
+                padding: 0.7rem 1rem;
+                font-size: 0.8rem;
+            }
+            
+            #whatsappButton a span {
+                display: none; /* Na bardzo małych ekranach pokazuj tylko ikonę */
+            }
+            
+            #whatsappButton a i {
+                margin: 0;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1595,11 +1665,10 @@
     <div class="grain-overlay"></div>
     <div class="progress-bar" id="progressBar"></div>
     
-    <!-- Przycisk WhatsApp (zmiana 6) -->
-    <div style="position: fixed; bottom: 100px; right: 20px; z-index: 1000; display: none;" id="whatsappButton">
+    <!-- Przycisk WhatsApp (zawsze widoczny) -->
+    <div id="whatsappButton">
         <a href="https://wa.me/48576054446?text=Cześć,%20chciałbym%20zapytać%20o%20montaż%20filmów%20globalcut.pl" 
-           target="_blank" 
-           style="background: #25D366; color: white; padding: 1rem 1.5rem; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); text-decoration: none; display: flex; align-items: center; gap: 10px;">
+           target="_blank">
             <i class="fab fa-whatsapp" style="font-size: 1.5rem;"></i>
             <span>WhatsApp</span>
         </a>
@@ -2192,16 +2261,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Pokazuj przycisk WhatsApp po scrollu
-            const whatsappButton = document.getElementById('whatsappButton');
-            window.addEventListener('scroll', function() {
-                if (window.pageYOffset > 300) {
-                    whatsappButton.style.display = 'block';
-                } else {
-                    whatsappButton.style.display = 'none';
-                }
-            });
-            
             // Obsługa powiększania filmów
             const videoOverlay = document.getElementById('videoOverlay');
             const projectCards = document.querySelectorAll('.project-card[data-video-id]');
@@ -2638,6 +2697,20 @@
             
             fadeElements.forEach(element => {
                 observer.observe(element);
+            });
+            
+            // Efekt hover dla przycisku WhatsApp (opcjonalny dodatek)
+            const whatsappButton = document.getElementById('whatsappButton');
+            const whatsappLink = whatsappButton.querySelector('a');
+            
+            whatsappLink.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.6)';
+            });
+            
+            whatsappLink.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = '0 4px 15px rgba(37, 211, 102, 0.4)';
             });
         });
         
