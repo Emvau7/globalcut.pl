@@ -1351,30 +1351,6 @@
             overflow: hidden;
         }
 
-        .instagram-placeholder {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            z-index: 2;
-            transition: all 0.5s ease;
-        }
-
-        .instagram-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            text-shadow: 0 0 10px rgba(0,0,0,0.5);
-        }
-
         .youtube-thumb {
             background: #000;
             position: relative;
@@ -1420,7 +1396,66 @@
             transform: scale(1.05);
         }
 
-        .project-card:hover .instagram-placeholder {
+        /* Instagram thumbnail styling */
+        .instagram-thumbnail {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .instagram-thumbnail::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            transform: translateX(-100%);
+        }
+
+        .project-card:hover .instagram-thumbnail::before {
+            opacity: 1;
+            transform: translateX(100%);
+            transition: all 0.6s ease;
+        }
+
+        .instagram-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+
+        .instagram-text {
+            z-index: 2;
+        }
+
+        .instagram-text span {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .instagram-text small {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .project-card:hover .instagram-thumbnail {
             transform: scale(1.05);
         }
 
@@ -1431,7 +1466,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        .instagram-placeholder {
+        .instagram-thumbnail {
             background-size: 200% 200%;
             animation: gradientAnimation 10s ease infinite;
         }
@@ -1567,6 +1602,14 @@
                 padding: 0.8rem 1.2rem;
                 font-size: 0.9rem;
             }
+
+            .instagram-icon {
+                font-size: 2rem;
+            }
+            
+            .instagram-text span {
+                font-size: 1rem;
+            }
         }
 
         @media (max-width: 576px) {
@@ -1642,6 +1685,18 @@
             #whatsappButton a i {
                 margin: 0;
             }
+
+            .instagram-icon {
+                font-size: 1.5rem;
+            }
+            
+            .instagram-text span {
+                font-size: 0.9rem;
+            }
+            
+            .instagram-text small {
+                font-size: 0.7rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1674,7 +1729,7 @@
             }
             
             .instagram-icon {
-                font-size: 2rem;
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -1877,7 +1932,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+</div>
 
                 <div class="project-card fade-in" data-video-id="mkYoRlInrAQ">
     <div class="project-thumbnail">
@@ -2022,19 +2077,23 @@
         </div>
     </div>
 </div>
-                
-<div class="project-card fade-in">
-    <div class="project-thumbnail" style="height: 200px; width: 100%; overflow: hidden; position: relative; border-radius: 12px;">
-        <a href="https://www.instagram.com/reel/DKcVj1JzEup/" target="_blank" style="display: block; width: 100%; height: 100%;">
-            <img src="miniaturka-ig.jpg" alt="Instagram Reel" 
-                 style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
-            
-            <div class="project-overlay">
-                <p>Instagram Reel - montaż filmów</p>
-            </div>
-        </a>
-    </div>
-</div>
+
+                <!-- POPRAWIONA KARTA INSTAGRAMA -->
+                <div class="project-card fade-in">
+                    <div class="project-thumbnail">
+                        <a href="https://www.instagram.com/reel/DKcVj1JzEup/" target="_blank" style="display: block; width: 100%; height: 100%;">
+                            <div class="instagram-thumbnail">
+                                <div class="instagram-icon">
+                                    <i class="fab fa-instagram"></i>
+                                </div>
+                                <div class="instagram-text">
+                                    <span>Instagram Reel</span>
+                                    <small>Zobacz nasze realizacje</small>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
                 
                 <!-- YouTube Shorts 1 -->
                 <div class="project-card fade-in" data-video-id="XtKtOHExd4Q">
