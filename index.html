@@ -2769,7 +2769,7 @@
                             const [minPLN, maxPLN] = pricePLN.split('-').map(Number);
                             // Specjalna obsługa dla vlogów (200-1000 PLN)
                             if (minPLN === 200 && maxPLN === 1000) {
-                                element.textContent = '50-250 $';
+                                element.textContent = '50-350 $';
                             } else {
                                 const minUSD = Math.round(minPLN * EXCHANGE_RATE_USD);
                                 const maxUSD = Math.round(maxPLN * EXCHANGE_RATE_USD);
