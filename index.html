@@ -1767,23 +1767,48 @@
         }
 
         @media (max-width: 768px) {
+            /* Nawigacja jako dolny pasek na telefonie */
             .nav-container {
-                top: 15px;
-                max-width: 95%;
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                transform: none;
+                width: 100%;
+                max-width: 100%;
+                border-radius: 18px 18px 0 0;
+                padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+                background: rgba(8, 9, 12, 0.96);
+            }
+
+            .nav-container:hover {
+                transform: none;
+                box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.55);
             }
 
             .nav-buttons {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 4px;
+                display: flex;
+                flex-wrap: nowrap;
+                gap: 2px;
+                justify-content: space-around;
+            }
+
+            .nav-btn {
+                flex: 1 1 0;
+                min-width: 0;
+                padding: 11px 4px;
+                font-size: 0.72rem;
+                letter-spacing: 0.01em;
+                text-align: center;
+                border-radius: 12px;
             }
 
             .hero-section {
-                padding-top: 80px;
+                padding-top: 70px;
             }
 
             .scroll-hint {
-                bottom: 20px;
+                bottom: 78px;
             }
 
             .project-thumbnail {
@@ -1827,15 +1852,26 @@
                 margin: 0 auto;
             }
 
-            /* WhatsApp na telefonach */
+            /* WhatsApp na telefonach (nad dolnym paskiem nawigacji) */
             #whatsappButton {
-                bottom: 80px;
+                bottom: 78px;
                 right: 15px;
             }
 
             #whatsappButton a {
                 padding: 0.8rem 1.2rem;
                 font-size: 0.9rem;
+            }
+
+            /* Przycisk "do góry" nad WhatsApp */
+            .scroll-to-top {
+                bottom: 140px;
+                right: 15px;
+            }
+
+            /* Miejsce na dolny pasek nawigacji */
+            .container {
+                padding-bottom: 76px;
             }
 
             .instagram-icon {
@@ -1852,8 +1888,9 @@
                 --mobile-padding: 15px;
             }
 
-            .nav-buttons {
-                grid-template-columns: 1fr;
+            .nav-btn {
+                font-size: 0.68rem;
+                padding: 10px 3px;
             }
 
             .contact-grid {
@@ -2242,21 +2279,6 @@
     </div>
 </div>
 
-<div class="project-card fade-in" data-video-id="M9gUbXL6JTM">
-    <div class="project-thumbnail">
-        <div class="youtube-thumb">
-            <img src="https://img.youtube.com/vi/M9gUbXL6JTM/maxresdefault.jpg"
-                 alt="Miniatura YouTube Shorts - postprodukcja filmowa"
-                 class="project-thumbnail-img"
-                 loading="lazy">
-            <div class="play-icon">
-                <svg viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z"/>
-                </svg>
-            </div>
-        </div>
-    </div>
-</div>
                 <!-- Nowe filmy dodane do sekcji portfolio -->
                 <div class="project-card fade-in" data-video-id="G9DxCS5Z6l0">
                     <div class="project-thumbnail">
@@ -2385,40 +2407,6 @@
     </div>
 </div>
 
-                <!-- Kolejny YouTube Shorts -->
-<div class="project-card fade-in" data-video-id="C-JMSNpFHnY">
-    <div class="project-thumbnail">
-        <div class="youtube-thumb">
-            <img src="https://img.youtube.com/vi/C-JMSNpFHnY/maxresdefault.jpg"
-                 alt="Miniatura YouTube Shorts - montaż filmów w Zielonej Górze"
-                 class="project-thumbnail-img"
-                 loading="lazy">
-            <div class="play-icon">
-                <svg viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z"/>
-                </svg>
-            </div>
-        </div>
-    </div>
-</div>
-
-                <!-- Nowy YouTube Shorts 2 -->
-                <div class="project-card fade-in" data-video-id="8DYf28ktWGo">
-                    <div class="project-thumbnail">
-                        <div class="youtube-thumb">
-                            <img src="https://img.youtube.com/vi/8DYf28ktWGo/maxresdefault.jpg"
-                                 alt="Miniatura filmu YouTube - Impreza"
-                                 class="project-thumbnail-img"
-                                 loading="lazy">
-                            <div class="play-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M8 5v14l11-7z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="project-card fade-in" data-video-id="KtjYlioJgyA">
                     <div class="project-thumbnail">
                         <div class="youtube-thumb">
@@ -2519,6 +2507,23 @@
                         <div class="youtube-thumb">
                             <img src="https://img.youtube.com/vi/8YH0HfDJuD8/maxresdefault.jpg"
                                  alt="Miniatura YouTube Shorts - montaż filmów wideo"
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Najnowszy film (na końcu portfolio) -->
+                <div class="project-card fade-in" data-video-id="4yjw4zP52Wk">
+                    <div class="project-thumbnail">
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/4yjw4zP52Wk/maxresdefault.jpg"
+                                 alt="Miniatura YouTube Shorts - montaż rolek Zielona Góra"
                                  class="project-thumbnail-img"
                                  loading="lazy">
                             <div class="play-icon">
@@ -3269,7 +3274,7 @@
 
                 navAbout: "Über uns",
                 navPortfolio: "Portfolio",
-                navPricing: "Preisgestaltung",
+                navPricing: "Preise",
                 navContact: "Kontakt",
 
                 aboutTitle: "Professionelle Filmproduktion in Grünberg",
