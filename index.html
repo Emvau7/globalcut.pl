@@ -182,6 +182,10 @@
             --mobile-padding: 20px;
         }
 
+        html {
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
@@ -190,6 +194,7 @@
                 radial-gradient(ellipse at 50% -10%, rgba(150, 165, 190, 0.07) 0%, transparent 55%),
                 var(--dark-bg);
             overflow-x: hidden;
+            max-width: 100vw;
             font-weight: 400;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -420,6 +425,10 @@
             color: #ffffff;
             line-height: 1.05;
             text-shadow: 0 0 40px rgba(200, 208, 224, 0.22);
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
         }
 
         .logo-accent {
@@ -1807,8 +1816,9 @@
                 padding-top: 70px;
             }
 
+            /* Ukryta na telefonie — kolidowała z przyciskami hero, a jest dolny pasek nawigacji */
             .scroll-hint {
-                bottom: 78px;
+                display: none;
             }
 
             .project-thumbnail {
@@ -2391,38 +2401,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="project-card fade-in" data-video-id="fy8u8LK6TKg">
-    <div class="project-thumbnail">
-        <div class="youtube-thumb">
-            <img src="https://img.youtube.com/vi/fy8u8LK6TKg/maxresdefault.jpg"
-                 alt="Miniatura YouTube Shorts - edycja video online"
-                 class="project-thumbnail-img"
-                 loading="lazy">
-            <div class="play-icon">
-                <svg viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z"/>
-                </svg>
-            </div>
-        </div>
-    </div>
-</div>
-
-                <div class="project-card fade-in" data-video-id="KtjYlioJgyA">
-                    <div class="project-thumbnail">
-                        <div class="youtube-thumb">
-                            <img src="https://img.youtube.com/vi/KtjYlioJgyA/maxresdefault.jpg"
-                                 alt="Miniatura filmu YouTube - montaż filmów ślubnych"
-                                 class="project-thumbnail-img"
-                                 loading="lazy">
-                            <div class="play-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M8 5v14l11-7z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="project-card fade-in" data-video-id="D4Mll-qgX-A">
                     <div class="project-thumbnail">
                         <div class="youtube-thumb">
@@ -2524,6 +2502,70 @@
                         <div class="youtube-thumb">
                             <img src="https://img.youtube.com/vi/4yjw4zP52Wk/maxresdefault.jpg"
                                  alt="Miniatura YouTube Shorts - montaż rolek Zielona Góra"
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card fade-in" data-video-id="TUD4w5ZglYI">
+                    <div class="project-thumbnail">
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/TUD4w5ZglYI/maxresdefault.jpg"
+                                 alt="Miniatura filmu YouTube - montaż filmów Zielona Góra"
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card fade-in" data-video-id="wsYx3IFlSHw">
+                    <div class="project-thumbnail">
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/wsYx3IFlSHw/maxresdefault.jpg"
+                                 alt="Miniatura YouTube Shorts - montaż rolek Zielona Góra"
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card fade-in" data-video-id="8Zh2yxU54Zw">
+                    <div class="project-thumbnail">
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/8Zh2yxU54Zw/maxresdefault.jpg"
+                                 alt="Miniatura YouTube Shorts - montaż Reels i TikTok"
+                                 class="project-thumbnail-img"
+                                 loading="lazy">
+                            <div class="play-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card fade-in" data-video-id="CE5bZsUajGw">
+                    <div class="project-thumbnail">
+                        <div class="youtube-thumb">
+                            <img src="https://img.youtube.com/vi/CE5bZsUajGw/maxresdefault.jpg"
+                                 alt="Miniatura YouTube Shorts - montaż krótkich form wideo"
                                  class="project-thumbnail-img"
                                  loading="lazy">
                             <div class="play-icon">
@@ -3265,7 +3307,7 @@
                 modalOk: "OK"
             },
             de: {
-                heroTitle: "FILMBEARBEITUNG",
+                heroTitle: "FILMSCHNITT",
                 heroSubtitle: "Professionelle Filmproduktion<br>Präzision • Kreativität • Premium-Qualität",
                 premiumVibe: "Über 1000 fertige Realisierungen",
                 scrollText: "Nach unten scrollen",
