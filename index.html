@@ -2065,6 +2065,12 @@
                 <rect y="12" width="60" height="2" fill="#C8102E"/>
             </svg>
         </div>
+        <div class="language-flag" data-lang="ja" aria-label="日本語">
+            <svg viewBox="0 0 36 24" xmlns="http://www.w3.org/2000/svg">
+                <rect width="36" height="24" fill="#fff"/>
+                <circle cx="18" cy="12" r="7.2" fill="#bc002d"/>
+            </svg>
+        </div>
     </div>
 
     <nav class="nav-container">
@@ -3099,20 +3105,19 @@
 
             // Ceny per waluta: stałe kwoty data-eur / data-usd (z kursem jako zapas)
             function convertPrices(lang) {
-                const EXCHANGE_RATE_EUR = 0.23; // zapasowy kurs PLN -> EUR
-                const EXCHANGE_RATE_USD = 0.25; // zapasowy kurs PLN -> USD
                 document.querySelectorAll('[data-pln]').forEach(element => {
                     const pln = parseInt(element.getAttribute('data-pln'), 10);
                     if (isNaN(pln)) return;
-                    if (lang === 'pl') {
-                        element.textContent = pln + ' zł';
-                    } else if (lang === 'en') {
-                        const usd = element.getAttribute('data-usd');
-                        element.textContent = (usd !== null ? usd : Math.round(pln * EXCHANGE_RATE_USD)) + ' $';
-                    } else {
-                        const eur = element.getAttribute('data-eur');
-                        element.textContent = (eur !== null ? eur : Math.round(pln * EXCHANGE_RATE_EUR)) + ' €';
-                    }
+                    const usd = parseInt(element.getAttribute('data-usd'), 10);
+                    const eur = parseInt(element.getAttribute('data-eur'), 10);
+                    const usdv = isNaN(usd) ? Math.round(pln * 0.25) : usd;
+                    const eurv = isNaN(eur) ? Math.round(pln * 0.23) : eur;
+                    let txt;
+                    if (lang === 'pl') txt = pln + ' zł';
+                    else if (lang === 'de') txt = eurv + ' €';
+                    else if (lang === 'ja') txt = '¥' + (Math.round(usdv * 150 / 1000) * 1000).toLocaleString('en-US');
+                    else txt = usdv + ' $';
+                    element.textContent = txt;
                 });
             }
 
@@ -3470,6 +3475,89 @@
 
                 modalTitle: "Message sent!",
                 modalMessage: "Thank you for contacting us about video editing. We will get back to you within 24 hours.",
+                modalOk: "OK"
+            },
+            ja: {
+                heroTitle: "動画編集",
+                heroSubtitle: "プロの映像ポストプロダクション<br>精密さ • 創造性 • プレミアム品質",
+                premiumVibe: "1000件以上の制作実績",
+                scrollText: "下にスクロール",
+                heroCtaQuote: "見積もりを依頼",
+                heroCtaPortfolio: "実績を見る",
+
+                navAbout: "会社概要",
+                navPortfolio: "ポートフォリオ",
+                navPricing: "料金",
+                navContact: "お問い合わせ",
+
+                aboutTitle: "ジェロナ・グラの映像編集スタジオ",
+                aboutLead: "私たちはジェロナ・グラ（ポーランド）の映像編集スタジオで、得意とするのはショート動画（リール・TikTok・ショート）です。この縦型の短尺フォーマットを最も得意とし、最も楽しんで制作しています。地元およびオンラインで、ポーランド全国のお客様に対応しています。",
+                expertiseTitle: "主な制作内容：",
+                expertiseItems: [
+                    "<strong>リール・TikTok・ショート</strong> - スクロールを止める縦型ショート動画",
+                    "<strong>長尺素材からのショート制作</strong> - ポッドキャストやインタビューから最も魅力的な瞬間を選び、完成したクリップに仕上げます",
+                    "<strong>地元企業向けのショート</strong> - 不動産・飲食・ビューティー＆サービス業",
+                    "<strong>Instagram・Facebook用グラフィック</strong> - 投稿・カバー、ストーリーズ用アニメーションも",
+                    "<strong>ポッドキャスト・インタビュー</strong> - 全体の編集とSNS用の切り抜き",
+                    "<strong>長尺コンテンツ</strong> - Vlog・企業動画・記念動画（結婚式、休暇）"
+                ],
+                localText: "私たちはリモートで作業するため、場所は問いません。ほとんどのプロジェクトはオンラインで、ポーランドやヨーロッパ全域のお客様と進めています。<strong>ジェロナ・グラ</strong>周辺の方なら、対面でのお打ち合わせも可能です。",
+                whyTitle: "選ばれる理由：",
+                whyText: "どのプロジェクトも一つの物語として捉えています。映像的な感性とお客様の目的への意識を組み合わせ、見栄えだけでなく実際に成果を生む映像をお届けします。さらに、信頼できる納期厳守と細部へのこだわり。",
+                timelinessText: "",
+                globalText: "<strong>1本の素材から、まとめてショート動画に。</strong> 長いポッドキャストやインタビュー、収録素材をお送りください。冒頭に強いフックとオチを備えた、すぐ投稿できるショートを数本〜十数本に仕上げます。",
+                contactText: "素材とアイデアはお決まりですか？ ご連絡ください。何ができるかご提案します。",
+
+                portfolioTitle: "制作実績",
+
+                pricingTitle: "料金",
+                priceTitle1: "ショート動画編集",
+                priceTiers1: ["ベーシック", "スタンダード", "プレミアム"],
+                priceFeatures1: [
+                    "リール・TikTok・ショート — 縦型フォーマット",
+                    "ベーシック：カット・字幕・軽い補正",
+                    "スタンダード：音楽・ダイナミックな転換・ズーム・冒頭のフック",
+                    "プレミアム：モーショングラフィックス・アニメ字幕・Bロール・サウンドデザイン",
+                    "納期：1〜3日"
+                ],
+                priceTitle2: "SNS用グラフィック",
+                priceLabels2: ["単発グラフィック（投稿）", "パッケージ"],
+                priceFeatures2: [
+                    "Instagram・Facebook用グラフィック",
+                    "投稿・カバー画像",
+                    "パッケージ：投稿＋ストーリーズ用縦型版",
+                    "ストーリーズ用アニメーション版",
+                    "イベント用グラフィック"
+                ],
+                priceTitle3: "大型プロジェクト",
+                priceFrom: "",
+                priceCustom: "個別見積もり",
+                priceFeatures3: [
+                    "ポッドキャスト・インタビュー",
+                    "Vlog・長尺コンテンツ",
+                    "記念動画 — 結婚式・休暇・イベント",
+                    "フル編集：シーン選び・カラー・サウンド",
+                    "パッケージならショートも切り出します"
+                ],
+                ctaTitle: "動画編集の見積もりが必要ですか？",
+                ctaSubtitle: "プロジェクトはどれも唯一無二です。ご要望に合わせた個別のお見積もりをご提案します。ジェロナ・グラおよびオンラインで対応します。",
+
+                contactTitle: "お問い合わせ — 動画編集 ジェロナ・グラ",
+                emailTitle: "メール",
+                phoneTitle: "電話",
+                whatsappText: "WhatsApp",
+                locationTitle: "所在地",
+                facebookTitle: "Facebook",
+                visitText: "プロフィールを見る",
+                formTitle: "メッセージを送る",
+                nameLabel: "お名前",
+                emailLabel: "メール",
+                phoneLabel: "電話（任意）",
+                messageLabel: "プロジェクトの内容",
+                submitBtn: "メッセージを送信",
+
+                modalTitle: "送信しました！",
+                modalMessage: "動画編集についてお問い合わせいただきありがとうございます。24時間以内にご連絡いたします。",
                 modalOk: "OK"
             }
         };
