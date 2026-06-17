@@ -2662,8 +2662,8 @@
                 <div class="contact-item fade-in visible">
                     <div class="contact-icon">📍</div>
                     <h3 class="contact-title" id="location-title">Lokalizacja</h3>
-                    <p class="contact-details">Zielona Góra, woj. lubuskie</p>
-                    <p class="contact-details" style="font-size: 0.9rem; margin-top: 5px; color: var(--primary);">
+                    <p class="contact-details" id="location-city">Zielona Góra, woj. lubuskie</p>
+                    <p class="contact-details" id="location-note" style="font-size: 0.9rem; margin-top: 5px; color: var(--primary);">
                         Usługi montażu filmów w całej Polsce online
                     </p>
                 </div>
@@ -3081,6 +3081,8 @@
                     document.getElementById('phone-title').textContent = translations[lang].phoneTitle;
                     document.getElementById('whatsapp-text').textContent = translations[lang].whatsappText;
                     document.getElementById('location-title').textContent = translations[lang].locationTitle;
+                    document.getElementById('location-city').textContent = translations[lang].locationCity;
+                    document.getElementById('location-note').textContent = translations[lang].locationNote;
                     document.getElementById('facebook-title').textContent = translations[lang].facebookTitle;
                     document.getElementById('visit-text').textContent = translations[lang].visitText;
 
@@ -3298,6 +3300,8 @@
                 phoneTitle: "Telefon",
                 whatsappText: "WhatsApp",
                 locationTitle: "Lokalizacja",
+                locationCity: "Zielona Góra, woj. lubuskie",
+                locationNote: "Usługi montażu filmów w całej Polsce online",
                 facebookTitle: "Facebook",
                 visitText: "Odwiedź nasz profil",
                 formTitle: "Wyślij nam wiadomość",
@@ -3381,6 +3385,8 @@
                 phoneTitle: "Telefon",
                 whatsappText: "WhatsApp",
                 locationTitle: "Standort",
+                locationCity: "Zielona Góra, Woiwodschaft Lebus",
+                locationNote: "Videobearbeitung in ganz Polen – online",
                 facebookTitle: "Facebook",
                 visitText: "Besuchen Sie unser Profil",
                 formTitle: "Senden Sie uns eine Nachricht über Filmbearbeitung",
@@ -3464,6 +3470,8 @@
                 phoneTitle: "Phone",
                 whatsappText: "WhatsApp",
                 locationTitle: "Location",
+                locationCity: "Zielona Góra, Lubuskie region",
+                locationNote: "Video editing across Poland — online",
                 facebookTitle: "Facebook",
                 visitText: "Visit our profile",
                 formTitle: "Send us a message about video editing",
@@ -3547,6 +3555,8 @@
                 phoneTitle: "電話",
                 whatsappText: "WhatsApp",
                 locationTitle: "所在地",
+                locationCity: "ジェロナ・グラ（ルブシュ県）",
+                locationNote: "ポーランド全国対応・オンライン",
                 facebookTitle: "Facebook",
                 visitText: "プロフィールを見る",
                 formTitle: "メッセージを送る",
