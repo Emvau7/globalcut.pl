@@ -2019,9 +2019,50 @@
             .petal-layer, .fog-layer, .grain-overlay { display: none; }
             * { animation-duration: 0.001s !important; }
         }
+
+        /* ── Tło hero: film katedry sterowany przewijaniem (tylko góra strony) ── */
+        .hero-film {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+            background: var(--dark-bg);
+            will-change: opacity;
+        }
+
+        .hero-film canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            transform-origin: 50% 40%;
+            animation: heroFilmDrift 28s ease-in-out infinite alternate;
+        }
+
+        /* przyciemnienie pod napisem + wtopienie dołu w tło strony */
+        .hero-film::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 50% 46%, rgba(7, 8, 9, 0.5) 0%, rgba(7, 8, 9, 0.2) 60%, rgba(7, 8, 9, 0.05) 100%),
+                linear-gradient(to bottom, rgba(7, 8, 9, 0.35) 0%, transparent 25%, transparent 55%, var(--dark-bg) 100%);
+        }
+
+        @keyframes heroFilmDrift {
+            from { transform: scale(1); }
+            to { transform: scale(1.06); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero-film canvas { animation: none; }
+        }
     </style>
 </head>
 <body>
+    <div class="hero-film" id="heroFilm" aria-hidden="true"><canvas id="heroFilmCanvas"></canvas></div>
     <div class="fog-layer"></div>
     <div class="vignette"></div>
     <div class="petal-layer" id="petalLayer"></div>
@@ -3632,6 +3673,109 @@
                 });
             }
         }
+    </script>
+    <script>
+    // Tło hero: sekwencja klatek (WebP) odtwarzana w rytmie przewijania.
+    // Działa tylko na górze strony i płynnie zanika, zanim zacznie się "O firmie".
+    (function () {
+        var wrap = document.getElementById('heroFilm');
+        var canvas = document.getElementById('heroFilmCanvas');
+        if (!wrap || !canvas || !canvas.getContext) return;
+
+        var mobile = window.innerWidth < 768;
+        var dir = mobile ? 'hero/m/' : 'hero/d/';
+        var total = mobile ? 49 : 73;
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var ctx = canvas.getContext('2d');
+        var frames = new Array(total);
+        var loaded = 0;
+        var current = 0, target = 0, lastDrawn = -1;
+        var ticking = false, running = false;
+
+        function name(i) { return dir + 'f' + String(i + 1).padStart(3, '0') + '.webp'; }
+
+        function resize() {
+            var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+            canvas.width = Math.round(window.innerWidth * dpr);
+            canvas.height = Math.round(window.innerHeight * dpr);
+            lastDrawn = -1;
+            draw(Math.round(current));
+        }
+
+        function nearestLoaded(i) {
+            for (var d = 0; d < total; d++) {
+                var a = frames[i - d], b = frames[i + d];
+                if (a && a.complete && a.naturalWidth) return a;
+                if (b && b.complete && b.naturalWidth) return b;
+            }
+            return null;
+        }
+
+        function draw(i) {
+            if (i === lastDrawn) return;
+            var img = nearestLoaded(i);
+            if (!img) return;
+            lastDrawn = i;
+            // "cover": wypełnij cały ekran, wyśrodkuj
+            var cw = canvas.width, ch = canvas.height;
+            var s = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
+            var w = img.naturalWidth * s, h = img.naturalHeight * s;
+            ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+        }
+
+        function progress() {
+            var vh = window.innerHeight;
+            var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+            // film biegnie przez pierwsze ~1,1 ekranu przewijania
+            var p = Math.min(Math.max(y / (vh * 1.1), 0), 1);
+            // zanikanie: od 45% hero (na telefonie od 25%) do zera tuż przed sekcją "O firmie"
+            var start = mobile ? 0.25 : 0.45;
+            var fade = 1 - Math.min(Math.max((y - vh * start) / (vh * (1 - start)), 0), 1);
+            wrap.style.opacity = fade.toFixed(3);
+            wrap.style.visibility = fade <= 0 ? 'hidden' : 'visible';
+            return { p: p, visible: fade > 0 };
+        }
+
+        function loop() {
+            var st = progress();
+            if (!st.visible) { running = false; return; }
+            if (!reduce) target = st.p * (total - 1);
+            current += (target - current) * 0.14;      // lekka bezwładność = płynność
+            if (Math.abs(target - current) < 0.01) current = target;
+            draw(Math.round(current));
+            if (Math.abs(target - current) > 0.01) requestAnimationFrame(loop);
+            else running = false;
+        }
+
+        function kick() {
+            if (running) return;
+            running = true;
+            requestAnimationFrame(loop);
+        }
+
+        // pierwsza klatka od razu, reszta w tle
+        function load(i) {
+            var img = new Image();
+            img.decoding = 'async';
+            img.onload = function () {
+                loaded++;
+                if (i === 0) { resize(); wrap.style.opacity = 1; }
+                kick();
+            };
+            img.src = name(i);
+            frames[i] = img;
+        }
+        load(0);
+        var next = 1;
+        (function pump() {
+            var batch = 0;
+            while (next < total && batch < 6) { load(next++); batch++; }
+            if (next < total) setTimeout(pump, 60);
+        })();
+
+        window.addEventListener('scroll', function () { progress(); kick(); }, { passive: true });
+        window.addEventListener('resize', function () { resize(); kick(); });
+    })();
     </script>
 </body>
 </html>
