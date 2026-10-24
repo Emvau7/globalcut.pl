@@ -37,6 +37,7 @@
     <link rel="alternate" hreflang="pl" href="https://globalcut.pl/">
     <link rel="alternate" hreflang="en" href="https://globalcut.pl/en/">
     <link rel="alternate" hreflang="de" href="https://globalcut.pl/de/">
+    <link rel="alternate" hreflang="ja" href="https://globalcut.pl/ja/">
 
     <!-- Dodatkowe meta tagi SEO -->
     <meta name="geo.region" content="PL-LB" />
@@ -3108,9 +3109,11 @@
                 });
             });
 
-            // Wczytaj wcześniej wybrany język
+            // Wczytaj język z linku (?lang=ja, /ja/) albo wcześniej wybrany
             let savedLang = null;
             try { savedLang = localStorage.getItem('gc_lang'); } catch (e) {}
+            const urlLang = new URLSearchParams(location.search).get('lang');
+            if (urlLang && translations[urlLang]) savedLang = urlLang;
             if (savedLang && savedLang !== 'pl' && translations[savedLang]) {
                 languageFlags.forEach(f => f.classList.toggle('active', f.dataset.lang === savedLang));
                 setLanguage(savedLang);
