@@ -3113,7 +3113,10 @@
             let savedLang = null;
             try { savedLang = localStorage.getItem('gc_lang'); } catch (e) {}
             const urlLang = new URLSearchParams(location.search).get('lang');
-            if (urlLang && translations[urlLang]) savedLang = urlLang;
+            if (urlLang && translations[urlLang]) {
+                savedLang = urlLang;
+                try { localStorage.setItem('gc_lang', urlLang); } catch (e) {}
+            }
             if (savedLang && savedLang !== 'pl' && translations[savedLang]) {
                 languageFlags.forEach(f => f.classList.toggle('active', f.dataset.lang === savedLang));
                 setLanguage(savedLang);
