@@ -1424,6 +1424,26 @@
             margin-bottom: clamp(1.5rem, 3vw, 2rem);
         }
 
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .modal-actions .submit-btn {
+            text-decoration: none;
+            min-width: min(260px, 100%);
+        }
+
+        .modal-note {
+            margin-top: clamp(1rem, 2vw, 1.4rem);
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
         .fade-in {
             opacity: 0;
             transform: translateY(30px);
@@ -2819,6 +2839,21 @@
         </div>
     </div>
 
+    <!-- Okno awaryjne: gdy formularz nie wyśle wiadomości, klient wysyła ją mailem / WhatsAppem -->
+    <div class="modal" id="formFailModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeFailModal">×</button>
+            <div class="modal-icon">✉️</div>
+            <h3 class="modal-title" id="fail-title">Wiadomość nie została wysłana</h3>
+            <p class="modal-message" id="fail-message">Formularz chwilowo nie działa. Wyślij tę samą wiadomość jednym kliknięciem – treść jest już wpisana.</p>
+            <div class="modal-actions">
+                <a class="submit-btn" id="failMailBtn" href="mailto:mateuszjanczura1999@gmail.com">Wyślij e-mailem</a>
+                <a class="submit-btn" id="failWaBtn" href="https://wa.me/48576054446" target="_blank" rel="noopener">Wyślij na WhatsApp</a>
+            </div>
+            <p class="modal-note"><span id="fail-note-label">albo napisz bezpośrednio:</span> mateuszjanczura1999@gmail.com · +48 576 054 446</p>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // ── Dryfujące płatki / popiół (atmosfera) ──
@@ -3198,6 +3233,11 @@
                     document.getElementById('modal-title').textContent = translations[lang].modalTitle;
                     document.getElementById('modal-message').textContent = translations[lang].modalMessage;
                     document.getElementById('modalOkBtn').textContent = translations[lang].modalOk;
+                    document.getElementById('fail-title').textContent = translations[lang].failTitle;
+                    document.getElementById('fail-message').textContent = translations[lang].failMessage;
+                    document.getElementById('failMailBtn').textContent = translations[lang].failMail;
+                    document.getElementById('failWaBtn').textContent = translations[lang].failWa;
+                    document.getElementById('fail-note-label').textContent = translations[lang].failNote;
 
                     // Usuń klasę animacji po zakończeniu
                     setTimeout(() => {
@@ -3228,6 +3268,21 @@
             const contactForm = document.getElementById('contactForm');
             const submitBtn = document.getElementById('submitBtn');
             const formModal = document.getElementById('formModal');
+            const formFailModal = document.getElementById('formFailModal');
+
+            // Wysyłka nie doszła: gotowy mail / WhatsApp z treścią z formularza
+            function showFormFallback() {
+                const t = translations[document.documentElement.lang] || translations.pl;
+                const val = id => document.getElementById(id).value.trim();
+                const details = [t.nameLabel + ': ' + val('name'), t.emailTitle + ': ' + val('email')];
+                if (val('phone')) details.push(t.phoneTitle + ': ' + val('phone'));
+                const text = val('message') + '\r\n\r\n' + details.join('\r\n');
+
+                document.getElementById('failMailBtn').href = 'mailto:mateuszjanczura1999@gmail.com?subject=' +
+                    encodeURIComponent(t.failSubject) + '&body=' + encodeURIComponent(text);
+                document.getElementById('failWaBtn').href = 'https://wa.me/48576054446?text=' + encodeURIComponent(text);
+                formFailModal.style.display = 'flex';
+            }
 
             if (contactForm) {
                 contactForm.addEventListener('submit', function(e) {
@@ -3238,24 +3293,34 @@
 
                     // Zbierz dane z formularza
                     const formData = new FormData(contactForm);
+                    const abort = new AbortController();
+                    const timeout = setTimeout(() => abort.abort(), 15000);
 
                     // Wyślij przez AJAX
                     fetch('https://formsubmit.co/ajax/mateuszjanczura1999@gmail.com', {
                         method: 'POST',
-                        body: formData
+                        headers: { 'Accept': 'application/json' },
+                        body: formData,
+                        signal: abort.signal
                     })
-                    .then(response => response.json())
-                    .then(data => {
+                    .then(response => response.json().then(data => {
+                        // Sukces tylko, gdy serwis potwierdzi przyjęcie wiadomości
+                        if (!response.ok || String(data.success) !== 'true') {
+                            throw new Error(data.message || 'HTTP ' + response.status);
+                        }
+                    }))
+                    .then(() => {
                         // Sukces - pokaż modal
                         contactForm.reset();
                         formModal.style.display = 'flex';
-                        submitBtn.classList.remove('sending');
-                        submitBtn.disabled = false;
                     })
                     .catch(error => {
-                        // Błąd
+                        // Błąd - wiadomość nie doszła, pokaż wysyłkę mailem / WhatsAppem
                         console.error('Error:', error);
-                        alert('Wystąpił błąd podczas wysyłania wiadomości. Spróbuj ponownie.');
+                        showFormFallback();
+                    })
+                    .finally(() => {
+                        clearTimeout(timeout);
                         submitBtn.classList.remove('sending');
                         submitBtn.disabled = false;
                     });
@@ -3264,6 +3329,10 @@
 
             document.getElementById('closeFormModal').addEventListener('click', function() {
                 formModal.style.display = 'none';
+            });
+
+            document.getElementById('closeFailModal').addEventListener('click', function() {
+                formFailModal.style.display = 'none';
             });
 
             document.getElementById('modalOkBtn').addEventListener('click', function() {
@@ -3414,7 +3483,13 @@
 
                 modalTitle: "Wiadomość wysłana!",
                 modalMessage: "Dziękujemy za kontakt w sprawie montażu filmów. Skontaktujemy się z Tobą w ciągu 24 godzin.",
-                modalOk: "OK"
+                modalOk: "OK",
+                failTitle: "Wiadomość nie została wysłana",
+                failMessage: "Formularz chwilowo nie działa. Wyślij tę samą wiadomość jednym kliknięciem – treść jest już wpisana.",
+                failMail: "Wyślij e-mailem",
+                failWa: "Wyślij na WhatsApp",
+                failNote: "albo napisz bezpośrednio:",
+                failSubject: "Wiadomość z globalcut.pl – montaż filmów"
             },
             de: {
                 heroTitle: "FILMSCHNITT",
@@ -3499,7 +3574,13 @@
 
                 modalTitle: "Nachricht gesendet!",
                 modalMessage: "Vielen Dank für Ihre Kontaktaufnahme bezüglich Filmbearbeitung. Wir werden uns innerhalb von 24 Stunden bei Ihnen melden.",
-                modalOk: "OK"
+                modalOk: "OK",
+                failTitle: "Nachricht wurde nicht gesendet",
+                failMessage: "Das Formular funktioniert gerade nicht. Senden Sie dieselbe Nachricht mit einem Klick – der Text ist schon eingetragen.",
+                failMail: "Per E-Mail senden",
+                failWa: "Per WhatsApp senden",
+                failNote: "oder schreiben Sie direkt:",
+                failSubject: "Anfrage über globalcut.pl – Videoschnitt"
             },
             en: {
                 heroTitle: "VIDEO EDITING",
@@ -3584,7 +3665,13 @@
 
                 modalTitle: "Message sent!",
                 modalMessage: "Thank you for contacting us about video editing. We will get back to you within 24 hours.",
-                modalOk: "OK"
+                modalOk: "OK",
+                failTitle: "Your message wasn't sent",
+                failMessage: "Our form is temporarily down. Send the same message in one click – the text is already filled in.",
+                failMail: "Send by email",
+                failWa: "Send on WhatsApp",
+                failNote: "or write to us directly:",
+                failSubject: "Enquiry via globalcut.pl – video editing"
             },
             ja: {
                 heroTitle: "動画編集",
@@ -3669,7 +3756,13 @@
 
                 modalTitle: "送信しました！",
                 modalMessage: "動画編集についてお問い合わせいただきありがとうございます。24時間以内にご連絡いたします。",
-                modalOk: "OK"
+                modalOk: "OK",
+                failTitle: "メッセージは送信されませんでした",
+                failMessage: "フォームが一時的にご利用いただけません。ワンクリックで同じ内容を送信できます（本文は入力済みです）。",
+                failMail: "メールで送信",
+                failWa: "WhatsAppで送信",
+                failNote: "または直接ご連絡ください：",
+                failSubject: "globalcut.pl からのお問い合わせ（動画編集）"
             }
         };
 
