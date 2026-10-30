@@ -2799,11 +2799,12 @@
 
             <div class="contact-form fade-in visible" id="contactFormSection">
                 <h3 class="section-title" style="font-size: clamp(1.4rem, 3vw, 1.8rem); margin-bottom: clamp(1.5rem, 3vw, 2rem);" id="form-title">Wyślij nam wiadomość</h3>
-<!-- FORMULARZ Z FORMSUBMIT.CO (AJAX) -->
+<!-- FORMULARZ Z WEB3FORMS (AJAX) -->
 <form id="contactForm">
-    <input type="hidden" name="_subject" value="Nowa wiadomość z globalcut.pl - montaż filmów">
-    <input type="hidden" name="_template" value="table">
-    <input type="hidden" name="_captcha" value="false">
+    <input type="hidden" name="access_key" value="a2332a64-fe67-408a-a6e2-2d55a6221bf9">
+    <input type="hidden" name="subject" value="Nowa wiadomość z globalcut.pl - montaż filmów">
+    <input type="hidden" name="from_name" value="globalcut.pl">
+    <input type="checkbox" name="botcheck" style="display: none;" tabindex="-1" autocomplete="off">
 
     <div class="form-group">
         <label for="name" id="name-label">Imię i nazwisko</label>
@@ -3264,7 +3265,7 @@
                 });
             }
 
-            // FORMULARZ KONTAKTOWY Z FORMSUBMIT.CO (AJAX)
+            // FORMULARZ KONTAKTOWY Z WEB3FORMS (AJAX)
             const contactForm = document.getElementById('contactForm');
             const submitBtn = document.getElementById('submitBtn');
             const formModal = document.getElementById('formModal');
@@ -3297,7 +3298,7 @@
                     const timeout = setTimeout(() => abort.abort(), 15000);
 
                     // Wyślij przez AJAX
-                    fetch('https://formsubmit.co/ajax/mateuszjanczura1999@gmail.com', {
+                    fetch('https://api.web3forms.com/submit', {
                         method: 'POST',
                         headers: { 'Accept': 'application/json' },
                         body: formData,
