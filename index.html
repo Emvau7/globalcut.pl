@@ -109,6 +109,14 @@
                     "@type": "Offer",
                     "itemOffered": {
                         "@type": "Service",
+                        "name": "Reklamy i rolki AI (reklamy produktowe AI)"
+                    },
+                    "price": "300-1000 zł"
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
                         "name": "Montaż rolek (Reels, TikTok, Shorts)"
                     },
                     "price": "100-350 zł"
@@ -125,7 +133,7 @@
                     "@type": "Offer",
                     "itemOffered": {
                         "@type": "Service",
-                        "name": "Większe projekty (podcasty, vlogi, filmy pamiątkowe)"
+                        "name": "Większe projekty (podcasty, filmy urodzinowe, filmy pamiątkowe, vlogi)"
                     },
                     "price": "od 500 zł"
                 }
@@ -1059,6 +1067,99 @@
 
         .price-card:hover .price-features li::before {
             transform: scale(1.2);
+        }
+
+        /* Wyróżniona karta: reklamy i rolki AI */
+        .pricing-featured {
+            margin-top: clamp(1.5rem, 3vw, 3rem);
+            padding: 0 var(--mobile-padding);
+        }
+
+        .price-card-featured {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+            gap: clamp(1.2rem, 3vw, 3rem);
+            align-items: center;
+            text-align: left;
+            padding: clamp(1.8rem, 4vw, 3.2rem);
+            border-color: rgba(168, 192, 232, 0.55);
+            background:
+                radial-gradient(ellipse at 0% 0%, rgba(140, 172, 230, 0.24) 0%, transparent 60%),
+                radial-gradient(ellipse at 100% 100%, rgba(212, 217, 226, 0.08) 0%, transparent 60%),
+                rgba(255, 255, 255, 0.03);
+            box-shadow: 0 0 50px rgba(140, 172, 230, 0.18);
+        }
+
+        .price-card-featured::before {
+            opacity: 1;
+            background: linear-gradient(90deg, transparent, #a9c1ec, transparent);
+        }
+
+        .price-card-featured:hover {
+            transform: translateY(-6px);
+            border-color: rgba(168, 192, 232, 0.65);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55), 0 0 55px rgba(140, 172, 230, 0.2);
+        }
+
+        .price-card-featured > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .price-badge {
+            display: inline-block;
+            margin-bottom: 1rem;
+            padding: 0.35rem 0.9rem;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #e6ecf7, #a9bde3);
+            color: #0a0b0e;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .price-card-featured .price-title {
+            font-size: clamp(1.25rem, 3.5vw, 1.6rem);
+            color: #ffffff;
+            margin-bottom: 0.8rem;
+        }
+
+        .featured-lead {
+            color: #b6bcc8;
+            font-size: clamp(0.9rem, 2.2vw, 1rem);
+            line-height: 1.6;
+            margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
+        }
+
+        .price-card-featured .price-amount {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            column-gap: 0.25em;
+            margin-bottom: 0.4rem;
+        }
+
+        .price-card-featured .price-amount > span {
+            white-space: nowrap;
+        }
+
+        .price-card-featured .price-custom {
+            margin-bottom: clamp(1.2rem, 3vw, 1.6rem);
+        }
+
+        .price-card-featured .price-features {
+            margin-bottom: 0;
+        }
+
+        .price-card-featured .price-features li {
+            color: #d0d5df;
+            font-size: clamp(0.9rem, 2.2vw, 1rem);
+            margin-bottom: 0.95rem;
+        }
+
+        .price-card-featured .submit-btn {
+            min-width: 0;
         }
 
         .contact-grid {
@@ -2703,11 +2804,29 @@
 
         <section id="pricing" class="section">
             <h2 class="section-title" id="pricing-title">Cennik usług montażu filmów</h2>
+            <div class="pricing-featured">
+                <div class="price-card price-card-featured fade-in visible">
+                    <div class="featured-main">
+                        <span class="price-badge" id="price-badge-ai">Nasza specjalność</span>
+                        <h3 class="price-title" id="price-title-ai">Reklamy i rolki AI</h3>
+                        <p class="featured-lead" id="price-lead-ai">Reklamy produktowe i rolki tworzone z pomocą sztucznej inteligencji — od pomysłu do gotowego filmu.</p>
+                        <div class="price-amount"><span class="price-from" id="price-from-ai">od</span><span data-pln="300" data-eur="150" data-usd="150">300 zł</span><span class="price-from" id="price-to-ai">do</span><span data-pln="1000" data-eur="500" data-usd="500">1000 zł</span></div>
+                        <p class="price-custom" id="price-custom-ai">Cena za sztukę</p>
+                        <button type="button" class="submit-btn" id="price-cta-ai" onclick="activateContactSection()">Zapytaj o reklamę AI</button>
+                    </div>
+                    <ul class="price-features" id="price-features-ai">
+                        <li>Reklamy produktowe AI — Twój produkt w scenach, których nie trzeba nagrywać</li>
+                        <li>Rolki AI na Reels, TikTok i Shorty</li>
+                        <li>Scenariusz, ujęcia AI, montaż, napisy i muzyka</li>
+                        <li>Gotowe pod kampanie reklamowe na Facebooku, Instagramie i TikToku</li>
+                    </ul>
+                </div>
+            </div>
             <div class="pricing-grid">
                 <div class="price-card fade-in visible">
                     <h3 class="price-title" id="price-title-1">Montaż rolek</h3>
                     <div class="price-tiers" id="price-tiers-1">
-                        <div class="price-tier"><span class="tier-name">Podstawowy</span><span class="tier-price" data-pln="80" data-eur="40" data-usd="40">80 zł</span></div>
+                        <div class="price-tier"><span class="tier-name">Podstawowy</span><span class="tier-price" data-pln="100" data-eur="40" data-usd="40">100 zł</span></div>
                         <div class="price-tier"><span class="tier-name">Standard</span><span class="tier-price" data-pln="150" data-eur="70" data-usd="80">150 zł</span></div>
                         <div class="price-tier"><span class="tier-name">Premium</span><span class="tier-price" data-pln="350" data-eur="150" data-usd="160">350 zł</span></div>
                     </div>
@@ -2741,10 +2860,9 @@
                     <p class="price-custom" id="price-custom-3">Wycena indywidualna</p>
                     <ul class="price-features" id="price-features-3">
                         <li>Podcasty i wywiady</li>
-                        <li>Vlogi i dłuższe formy</li>
+                        <li>Filmy urodzinowe — na 18-tkę, jubileusz czy niespodziankę</li>
                         <li>Filmy pamiątkowe — wesela, wakacje, imprezy</li>
-                        <li>Pełny montaż: dobór fragmentów, kolor, dźwięk</li>
-                        <li>W pakiecie wytnę z tego gotowe rolki</li>
+                        <li>Vlogi i dłuższe formy</li>
                     </ul>
                 </div>
             </div>
@@ -3184,6 +3302,13 @@
                     translations[lang].priceLabels2.forEach((t, i) => { if (tierNames2[i]) tierNames2[i].textContent = t; });
                     document.getElementById('price-from-3').textContent = translations[lang].priceFrom;
                     document.getElementById('price-custom-3').textContent = translations[lang].priceCustom;
+                    document.getElementById('price-badge-ai').textContent = translations[lang].priceBadgeAi;
+                    document.getElementById('price-title-ai').textContent = translations[lang].priceTitleAi;
+                    document.getElementById('price-lead-ai').textContent = translations[lang].priceLeadAi;
+                    document.getElementById('price-from-ai').textContent = translations[lang].priceFrom;
+                    document.getElementById('price-to-ai').textContent = translations[lang].priceTo;
+                    document.getElementById('price-custom-ai').textContent = translations[lang].priceCustomAi;
+                    document.getElementById('price-cta-ai').textContent = translations[lang].priceCtaAi;
 
                     const priceFeatures1 = document.getElementById('price-features-1');
                     priceFeatures1.innerHTML = '';
@@ -3207,6 +3332,14 @@
                         const li = document.createElement('li');
                         li.innerHTML = feature;
                         priceFeatures3.appendChild(li);
+                    });
+
+                    const priceFeaturesAi = document.getElementById('price-features-ai');
+                    priceFeaturesAi.innerHTML = '';
+                    translations[lang].priceFeaturesAi.forEach(feature => {
+                        const li = document.createElement('li');
+                        li.innerHTML = feature;
+                        priceFeaturesAi.appendChild(li);
                     });
 
                     document.getElementById('cta-title').textContent = translations[lang].ctaTitle;
@@ -3458,10 +3591,21 @@
                 priceCustom: "Wycena indywidualna",
                 priceFeatures3: [
                     "Podcasty i wywiady",
-                    "Vlogi i dłuższe formy",
+                    "Filmy urodzinowe — na 18-tkę, jubileusz czy niespodziankę",
                     "Filmy pamiątkowe — wesela, wakacje, imprezy",
-                    "Pełny montaż: dobór fragmentów, kolor, dźwięk",
-                    "W pakiecie wytnę z tego gotowe rolki"
+                    "Vlogi i dłuższe formy"
+                ],
+                priceBadgeAi: "Nasza specjalność",
+                priceTitleAi: "Reklamy i rolki AI",
+                priceLeadAi: "Reklamy produktowe i rolki tworzone z pomocą sztucznej inteligencji — od pomysłu do gotowego filmu.",
+                priceTo: "do",
+                priceCustomAi: "Cena za sztukę",
+                priceCtaAi: "Zapytaj o reklamę AI",
+                priceFeaturesAi: [
+                    "Reklamy produktowe AI — Twój produkt w scenach, których nie trzeba nagrywać",
+                    "Rolki AI na Reels, TikTok i Shorty",
+                    "Scenariusz, ujęcia AI, montaż, napisy i muzyka",
+                    "Gotowe pod kampanie reklamowe na Facebooku, Instagramie i TikToku"
                 ],
                 ctaTitle: "Potrzebujesz wyceny montażu filmów?",
                 ctaSubtitle: "Każdy projekt jest unikalny. Skontaktuj się z nami, aby otrzymać spersonalizowaną ofertę dostosowaną do Twoich potrzeb. Oferujemy montaż filmów w Zielonej Górze i online.",
@@ -3549,10 +3693,21 @@
                 priceCustom: "Individuelle Kalkulation",
                 priceFeatures3: [
                     "Podcasts und Interviews",
-                    "Vlogs und längere Formate",
+                    "Geburtstagsvideos — zum 18., zum Jubiläum oder als Überraschung",
                     "Erinnerungsvideos — Hochzeiten, Urlaub, Events",
-                    "Komplettschnitt: Szenenauswahl, Farbe, Ton",
-                    "Im Paket schneide ich daraus fertige Reels"
+                    "Vlogs und längere Formate"
+                ],
+                priceBadgeAi: "Unsere Spezialität",
+                priceTitleAi: "KI-Werbung & KI-Reels",
+                priceLeadAi: "Produktwerbung und Reels, erstellt mit künstlicher Intelligenz — von der Idee bis zum fertigen Video.",
+                priceTo: "bis",
+                priceCustomAi: "Preis pro Video",
+                priceCtaAi: "Nach KI-Werbung fragen",
+                priceFeaturesAi: [
+                    "KI-Produktwerbung — Ihr Produkt in Szenen, die nicht gedreht werden müssen",
+                    "KI-Videos für Reels, TikTok und Shorts",
+                    "Skript, KI-Aufnahmen, Schnitt, Untertitel und Musik",
+                    "Fertig für Werbekampagnen auf Facebook, Instagram und TikTok"
                 ],
                 ctaTitle: "Benötigen Sie ein Angebot für Filmbearbeitung?",
                 ctaSubtitle: "Jedes Projekt ist einzigartig. Kontaktieren Sie uns für ein personalisiertes Angebot, das auf Ihre Bedürfnisse zugeschnitten ist. Wir bieten Filmbearbeitung in Grünberg und online an.",
@@ -3640,10 +3795,21 @@
                 priceCustom: "Custom quote",
                 priceFeatures3: [
                     "Podcasts and interviews",
-                    "Vlogs and longer formats",
+                    "Birthday films — for an 18th, an anniversary or a surprise",
                     "Keepsake films — weddings, holidays, events",
-                    "Full edit: scene selection, color, sound",
-                    "As a bundle I can cut Reels out of it"
+                    "Vlogs and longer formats"
+                ],
+                priceBadgeAi: "Our specialty",
+                priceTitleAi: "AI ads & AI reels",
+                priceLeadAi: "Product ads and reels made with artificial intelligence — from idea to finished video.",
+                priceTo: "to",
+                priceCustomAi: "Price per video",
+                priceCtaAi: "Ask about an AI ad",
+                priceFeaturesAi: [
+                    "AI product ads — your product in scenes that never had to be filmed",
+                    "AI videos for Reels, TikTok and Shorts",
+                    "Script, AI shots, editing, captions and music",
+                    "Ready for ad campaigns on Facebook, Instagram and TikTok"
                 ],
                 ctaTitle: "Need a quote for video editing?",
                 ctaSubtitle: "Every project is unique. Contact us for a personalized offer tailored to your needs. We offer video editing in Zielona Góra and online.",
@@ -3731,10 +3897,21 @@
                 priceCustom: "個別見積もり",
                 priceFeatures3: [
                     "ポッドキャスト・インタビュー",
-                    "Vlog・長尺コンテンツ",
+                    "誕生日ムービー — 成人のお祝い・記念日・サプライズに",
                     "記念動画 — 結婚式・休暇・イベント",
-                    "フル編集：シーン選び・カラー・サウンド",
-                    "パッケージならショートも切り出します"
+                    "Vlog・長尺コンテンツ"
+                ],
+                priceBadgeAi: "当スタジオの得意分野",
+                priceTitleAi: "AI広告・AIショート動画",
+                priceLeadAi: "AIで制作する商品広告とショート動画 — 企画から完成まで。",
+                priceTo: "〜",
+                priceCustomAi: "1本あたりの料金",
+                priceCtaAi: "AI広告について問い合わせる",
+                priceFeaturesAi: [
+                    "AI商品広告 — 撮影不要のシーンで商品を表現",
+                    "リール・TikTok・ショート向けAI動画",
+                    "台本・AI映像・編集・字幕・音楽",
+                    "Facebook・Instagram・TikTokの広告キャンペーンにそのまま使える形式"
                 ],
                 ctaTitle: "動画編集の見積もりが必要ですか？",
                 ctaSubtitle: "プロジェクトはどれも唯一無二です。ご要望に合わせた個別のお見積もりをご提案します。ジェロナ・グラおよびオンラインで対応します。",
